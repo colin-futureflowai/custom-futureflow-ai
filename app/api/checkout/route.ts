@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    logger.info(`[Stripe ${stripeConfig.mode}] Creating checkout session for price:`, priceId)
+    logger.info(`[Stripe] Creating checkout session for price:`, priceId)
 
     // Create Stripe checkout session with config
     const session = await stripe.checkout.sessions.create({
@@ -36,21 +36,20 @@ export async function POST(request: NextRequest) {
       cancel_url: stripeConfig.cancelUrl,
       metadata: {
         product: 'Gewoon Beginnen met AI E-book',
-        environment: stripeConfig.mode,
+        environment: process.env.NODE_ENV || 'production',
       },
       customer_email: undefined, // Stripe will ask for email
       locale: stripeConfig.locale,
     })
 
-    logger.info(`[Stripe ${stripeConfig.mode}] Session created:`, session.id)
+    logger.info(`[Stripe] Session created:`, session.id)
 
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,
-      mode: stripeConfig.mode
     })
   } catch (error: any) {
-    logger.error(`[Stripe ${stripeConfig.mode}] Checkout error:`, error)
+    logger.error(`[Stripe] Checkout error:`, error)
 
     // Better error messages for common issues
     let errorMessage = 'Failed to create checkout session'
@@ -64,7 +63,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: error.message || errorMessage,
-        mode: stripeConfig.mode
       },
       { status: error.statusCode || 500 }
     )
