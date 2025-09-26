@@ -1,0 +1,21 @@
+{
+  "name": "Gewoon Beginnen met AI - FutureFlowAI",
+  "short_name": "AI Boek",
+  "description": "Praktische gids voor ondernemers die willen starten met AI zonder technische kennis",
+  "start_url": "/landing",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#32a029",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["books", "education", "business"],
+  "lang": "nl-NL",
+  "dir": "ltr"
+}

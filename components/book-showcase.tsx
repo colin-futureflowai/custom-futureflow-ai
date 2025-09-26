@@ -9,7 +9,7 @@ import { BookModel } from "./book-showcase/book-canvas"
 import { BookDetails } from "./book-showcase/book-details"
 import { DebugPanel } from "./book-showcase/debug-panel"
 import { booksData } from "./book-showcase/book-data"
-import { TexturePreloader } from "./book-showcase/texture-preloader" // Added texture preloader import
+import { TexturePreloader } from "./book-showcase/texture-preloader"
 
 export default function BookShowcase() {
   const [currentBookIndex, setCurrentBookIndex] = useState(0)
@@ -88,7 +88,8 @@ export default function BookShowcase() {
   const [debugMode, setDebugMode] = useState(false)
   const object2MeshRef = useRef<THREE.Mesh | null>(null)
 
-  const isDebugAllowed = process.env.NODE_ENV !== "production"
+  // Debug features only available in development
+  const isDebugAllowed = process.env.NODE_ENV === "development"
 
   const resetParams = () => {
     setParams(defaultParams)
@@ -96,7 +97,7 @@ export default function BookShowcase() {
   }
 
   const copyParams = () => {
-    console.log("Copying parameters:", params, materialProps)
+    logger.debug("Copying parameters:", params, materialProps)
   }
 
   const nextBook = () => {

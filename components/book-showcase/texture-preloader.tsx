@@ -1,70 +1,67 @@
-export class TexturePreloader {
-  private static instance: TexturePreloader
-  private preloadedTextures = new Map<string, HTMLImageElement>()
-  private loadingPromises = new Map<string, Promise<HTMLImageElement>>()
+"use client"
 
-  static getInstance(): TexturePreloader {
-    if (!TexturePreloader.instance) {
-      TexturePreloader.instance = new TexturePreloader()
+import { booksData } from "./books-data"
+
+class TexturePreloaderClass {
+  private static instance: TexturePreloaderClass
+  private preloadedImages: Map<string, HTMLImageElement> = new Map()
+
+  static getInstance(): TexturePreloaderClass {
+    if (!TexturePreloaderClass.instance) {
+      TexturePreloaderClass.instance = new TexturePreloaderClass()
     }
-    return TexturePreloader.instance
+    return TexturePreloaderClass.instance
   }
 
-  async preloadImage(url: string): Promise<HTMLImageElement> {
-    // Return cached image if already loaded
-    if (this.preloadedTextures.has(url)) {
-      return this.preloadedTextures.get(url)!
+  async preloadImage(src: string): Promise<HTMLImageElement> {
+    // Check if already preloaded
+    if (this.preloadedImages.has(src)) {
+      return this.preloadedImages.get(src)!
     }
 
-    // Return existing promise if already loading
-    if (this.loadingPromises.has(url)) {
-      return this.loadingPromises.get(url)!
-    }
-
-    // Create new loading promise
-    const loadPromise = new Promise<HTMLImageElement>((resolve, reject) => {
+    // Create and load new image
+    return new Promise((resolve, reject) => {
       const img = new Image()
       img.crossOrigin = "anonymous"
 
       img.onload = () => {
-        this.preloadedTextures.set(url, img)
-        this.loadingPromises.delete(url)
+        this.preloadedImages.set(src, img)
         resolve(img)
       }
 
       img.onerror = () => {
-        this.loadingPromises.delete(url)
-        reject(new Error(`Failed to preload image: ${url}`))
+        reject(new Error(`Failed to load image: ${src}`))
       }
 
-      img.src = url
+      img.src = src
     })
-
-    this.loadingPromises.set(url, loadPromise)
-    return loadPromise
   }
 
   async preloadAllBookTextures(): Promise<void> {
-    const texturePaths = [
-      "/images/x-101-front-cover.jpeg",
-      "/images/x-101-back-cover.jpeg",
-      "/images/we-are-so-back-cover-optimized.jpeg",
-      "/images/we-are-so-back-back-cover-optimized.jpeg",
-      "/images/vibe-coding-front-cover.jpeg",
-      "/images/vibe-coding-back-cover.jpeg",
-      "/images/how-to-say-please-front-cover.jpeg",
-      "/images/how-to-say-please-back-cover.jpeg",
-    ]
+    const allTextures: string[] = []
 
-    try {
-      await Promise.all(texturePaths.map((path) => this.preloadImage(path)))
-      console.log("All book textures preloaded successfully")
-    } catch (error) {
-      console.warn("Some textures failed to preload:", error)
-    }
+    booksData.forEach((book) => {
+      allTextures.push(book.coverUrl, book.backUrl, book.spineUrl)
+    })
+
+    await Promise.all(
+      allTextures.map(src => this.preloadImage(src).catch(err => {
+        console.warn(`Failed to preload texture: ${src}`, err)
+      }))
+    )
   }
 
-  getPreloadedImage(url: string): HTMLImageElement | null {
-    return this.preloadedTextures.get(url) || null
+  getPreloadedImage(src: string): HTMLImageElement | null {
+    return this.preloadedImages.get(src) || null
   }
+}
+
+// Export singleton instance
+export const TexturePreloader = TexturePreloaderClass
+
+// Legacy component for compatibility
+export function TexturePreloaderComponent() {
+  // This component doesn't need to do anything since preloading
+  // is now handled by the singleton class
+  return null
 }

@@ -1,44 +1,42 @@
 "use client"
 
-import type React from "react"
-import { useGLTF } from "@react-three/drei"
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState, useMemo } from "react"
+import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import type { BookParams, MaterialProps } from "./types"
-import { debugAllObjectsUV, debugUVMapping, generateUVForBothCovers } from "./uv-debugger"
+import { useGLTF } from "@react-three/drei"
+import { booksData } from "./books-data"
+import { generateUVForBothCovers, debugAllObjectsUV, debugUVMapping } from "./uv-debugger-safe"
 import { TexturePreloader } from "./texture-preloader"
 
-export function Book({
-  params,
-  materialProps,
-  meshRef,
-  onReady,
-  bookIndex = 0,
-}: {
-  params: BookParams
-  materialProps: MaterialProps
-  meshRef: React.MutableRefObject<THREE.Mesh | null>
-  onReady?: (ready: boolean) => void
-  bookIndex?: number
-}) {
+interface Book3DModelProps {
+  bookIndex: number
+  autoRotate?: boolean
+  rotationSpeed?: number
+  onPointerDown?: () => void
+  onPointerUp?: () => void
+}
+
+export function Book3DModel({
+  bookIndex,
+  autoRotate = false,
+  rotationSpeed = 0.5,
+  onPointerDown,
+  onPointerUp
+}: Book3DModelProps) {
+  const meshRef = useRef<THREE.Group>(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  // Use the correct GLB model with UV mapping
   const { scene } = useGLTF("/models/book_red.glb")
-  const bookRef = useRef<any>()
+
   const [bookScene, setBookScene] = useState<THREE.Object3D | null>(null)
   const [object2Mesh, setObject2Mesh] = useState<THREE.Mesh | null>(null)
   const [uvGenerated, setUvGenerated] = useState(false)
-  const [defaultTexture, setDefaultTexture] = useState<THREE.Texture | null>(null)
-  const [backCoverTexture, setBackCoverTexture] = useState<THREE.Texture | null>(null)
   const [combinedTexture, setCombinedTexture] = useState<THREE.Texture | null>(null)
-  const [currentBookIndex, setCurrentBookIndex] = useState<number>(bookIndex)
 
-  const isReady = uvGenerated && combinedTexture && object2Mesh
+  const book = booksData[bookIndex]
 
-  useEffect(() => {
-    if (onReady) {
-      onReady(isReady)
-    }
-  }, [isReady, onReady])
-
+  // Clone the scene to avoid modifying the original
   useEffect(() => {
     if (scene && !bookScene) {
       const clonedScene = scene.clone()
@@ -46,92 +44,7 @@ export function Book({
     }
   }, [scene, bookScene])
 
-  useEffect(() => {
-    if (bookIndex !== currentBookIndex || (!defaultTexture && !backCoverTexture)) {
-      setCurrentBookIndex(bookIndex)
-      setDefaultTexture(null)
-      setBackCoverTexture(null)
-      setCombinedTexture(null)
-
-      const loader = new THREE.TextureLoader()
-      const preloader = TexturePreloader.getInstance()
-
-      const loadTextureWithFallback = (
-        path: string,
-        onLoad: (texture: THREE.Texture) => void,
-        onError: (error: any) => void,
-      ) => {
-        // Try to use preloaded image first
-        const preloadedImg = preloader.getPreloadedImage(path)
-        if (preloadedImg) {
-          const texture = new THREE.Texture(preloadedImg)
-          texture.flipY = true
-          texture.colorSpace = THREE.SRGBColorSpace
-          texture.wrapS = THREE.RepeatWrapping
-          texture.wrapT = THREE.RepeatWrapping
-          texture.minFilter = THREE.LinearFilter
-          texture.magFilter = THREE.LinearFilter
-          texture.generateMipmaps = false
-          texture.needsUpdate = true
-          onLoad(texture)
-          return
-        }
-
-        // Fallback to regular THREE.TextureLoader with improved error handling
-        loader.load(path, onLoad, undefined, (error) => {
-          console.error(`[v0] Texture loading failed for ${path}:`, error)
-          onError(error)
-        })
-      }
-
-      const frontCoverPath = (() => {
-        switch (bookIndex) {
-          case 0: // X 101
-            return "/images/x-101-front-cover.jpeg"
-          case 1: // Dutch AI book - Gewoon Beginnen met AI+
-            return "/images/dutch-ai-front-cover.jpeg"
-          default:
-            return "/images/x-101-front-cover.jpeg"
-        }
-      })()
-
-      const backCoverPath = (() => {
-        switch (bookIndex) {
-          case 0: // X 101 - using dedicated back cover instead of placeholder
-            return "/images/x-101-back-cover.jpeg"
-          case 1: // Dutch AI book - Gewoon Beginnen met AI+
-            return "/images/dutch-ai-back-cover.jpeg"
-          default:
-            return "/images/x-101-back-cover.jpeg"
-        }
-      })()
-
-      console.log(`[v0] Loading textures for book ${bookIndex}: front=${frontCoverPath}, back=${backCoverPath}`)
-
-      loadTextureWithFallback(
-        frontCoverPath,
-        (texture) => {
-          setDefaultTexture(texture)
-          console.log(`[v0] Front cover texture loaded for book ${bookIndex}`)
-        },
-        (error) => {
-          console.error(`[v0] Failed to load front cover texture for book ${bookIndex}:`, error)
-        },
-      )
-
-      loadTextureWithFallback(
-        backCoverPath,
-        (texture) => {
-          setBackCoverTexture(texture)
-          console.log(`[v0] Back cover texture loaded for book ${bookIndex}`)
-        },
-        (error) => {
-          console.error(`[v0] Failed to load back cover texture for book ${bookIndex}:`, error)
-        },
-      )
-    }
-  }, [bookIndex, currentBookIndex, defaultTexture, backCoverTexture])
-
+  // Setup UV mapping for the book model
   useEffect(() => {
     if (bookScene && !uvGenerated) {
       try {
@@ -140,6 +53,7 @@ export function Book({
         console.log("Error during UV analysis:", error)
       }
 
+      // Try to find the book cover mesh using the correct hierarchy
       const sketchfabModel = bookScene.getObjectByName("Sketchfab_model")
       if (sketchfabModel) {
         const geode = sketchfabModel.getObjectByName("Geode")
@@ -147,25 +61,30 @@ export function Book({
           const object2 = geode.getObjectByName("Object_2")
           if (object2 && (object2 as THREE.Mesh).material) {
             const mesh = object2 as THREE.Mesh
-            console.log("Found Object_2 - book cover material loaded")
+            console.log("Found Object_2 - book cover material")
 
             generateUVForBothCovers(mesh)
             setUvGenerated(true)
-            console.log("UV coordinates generated for both front and back covers")
-
-            console.log("object.name:", mesh.name)
-            console.log("material.type:", mesh.material.constructor.name)
-            console.log("material.map:", (mesh.material as any).map)
             debugUVMapping(mesh)
 
             setObject2Mesh(mesh)
-            meshRef.current = mesh
           }
         }
+      } else {
+        // Fallback for simpler model structure
+        bookScene.traverse((child) => {
+          if (child instanceof THREE.Mesh && !object2Mesh) {
+            console.log(`Using fallback mesh: ${child.name}`)
+            generateUVForBothCovers(child)
+            setUvGenerated(true)
+            setObject2Mesh(child)
+          }
+        })
       }
     }
-  }, [bookScene, meshRef, uvGenerated])
+  }, [bookScene, uvGenerated, object2Mesh])
 
+  // Create combined texture from front and back covers
   const createCombinedTexture = (frontTexture: THREE.Texture, backTexture: THREE.Texture) => {
     const canvas = document.createElement("canvas")
     const ctx = canvas.getContext("2d")
@@ -195,83 +114,168 @@ export function Book({
     return combined
   }
 
+  // Load textures with preloader fallback
   useEffect(() => {
-    if (defaultTexture && backCoverTexture) {
-      const combined = createCombinedTexture(defaultTexture, backCoverTexture)
-      if (combined) {
-        setCombinedTexture(combined)
-        console.log("Combined front and back cover texture created")
+    const loader = new THREE.TextureLoader()
+    const preloader = TexturePreloader.getInstance()
+    let frontTexture: THREE.Texture | null = null
+    let backTexture: THREE.Texture | null = null
+
+    const checkAndCombine = () => {
+      if (frontTexture && backTexture) {
+        const combined = createCombinedTexture(frontTexture, backTexture)
+        if (combined) {
+          setCombinedTexture(combined)
+        }
       }
     }
-  }, [defaultTexture, backCoverTexture])
 
-  const applyMaterialToMesh = (mesh: THREE.Mesh, props: MaterialProps) => {
-    let material = mesh.userData.originalMaterial || mesh.material
-    if (Array.isArray(material)) {
-      material = material[0]
+    const loadTextureWithFallback = (
+      path: string,
+      onLoad: (texture: THREE.Texture) => void,
+      onError: (error: any) => void
+    ) => {
+      // Try to use preloaded image first
+      const preloadedImg = preloader.getPreloadedImage(path)
+      if (preloadedImg) {
+        const texture = new THREE.Texture(preloadedImg)
+        texture.flipY = true
+        texture.colorSpace = THREE.SRGBColorSpace
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        texture.generateMipmaps = false
+        texture.needsUpdate = true
+        onLoad(texture)
+        return
+      }
+
+      // Fallback to regular THREE.TextureLoader
+      loader.load(path, onLoad, undefined, onError)
     }
 
-    const clonedMaterial = material.clone()
+    // Load front cover
+    loadTextureWithFallback(
+      book.coverUrl,
+      (texture) => {
+        texture.flipY = true
+        texture.colorSpace = THREE.SRGBColorSpace
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        texture.generateMipmaps = false
+        frontTexture = texture
+        checkAndCombine()
+      },
+      (error) => {
+        console.error("Error loading front cover:", error)
+      }
+    )
 
-    if (props.texture) {
-      clonedMaterial.map = props.texture
-      props.texture.offset.set(props.offsetX, props.offsetY)
-      clonedMaterial.color.setRGB(1, 1, 1)
-      clonedMaterial.metalness = 0.4
-      clonedMaterial.roughness = 1
-      clonedMaterial.emissive.setRGB(0, 0, 0)
-      clonedMaterial.emissiveIntensity = 0
-      clonedMaterial.vertexColors = false
-      clonedMaterial.transparent = false
-      clonedMaterial.opacity = 1
-      clonedMaterial.visible = true
-      // Added polygon offset to prevent z-fighting between cover and page surfaces
-      clonedMaterial.polygonOffset = true
-      clonedMaterial.polygonOffsetFactor = -1 // pull slightly toward the camera
-      clonedMaterial.polygonOffsetUnits = -1
-      clonedMaterial.needsUpdate = true
+    // Load back cover
+    loadTextureWithFallback(
+      book.backUrl,
+      (texture) => {
+        texture.flipY = true
+        texture.colorSpace = THREE.SRGBColorSpace
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        texture.generateMipmaps = false
+        backTexture = texture
+        checkAndCombine()
+      },
+      (error) => {
+        console.error("Error loading back cover:", error)
+      }
+    )
+  }, [book.coverUrl, book.backUrl])
 
-      props.texture.colorSpace = THREE.SRGBColorSpace
-      props.texture.flipY = true
-    } else {
-      clonedMaterial.map = null
-      clonedMaterial.color.set(props.color)
-      clonedMaterial.emissive.set(props.emissive)
-      clonedMaterial.emissiveIntensity = props.emissiveIntensity
-      clonedMaterial.metalness = props.metalness
-      clonedMaterial.roughness = props.roughness
-      clonedMaterial.transparent = false
-      clonedMaterial.opacity = 1
-      clonedMaterial.visible = true
-      // Added polygon offset for non-texture materials as well
-      clonedMaterial.polygonOffset = true
-      clonedMaterial.polygonOffsetFactor = -1
-      clonedMaterial.polygonOffsetUnits = -1
-      clonedMaterial.needsUpdate = true
-    }
-
-    mesh.material = clonedMaterial
-  }
-
+  // Apply textures to the book mesh
   useEffect(() => {
     if (object2Mesh && combinedTexture && uvGenerated) {
-      console.log("Applying combined front and back cover textures to Object_2")
-      const combinedProps = { ...materialProps, texture: combinedTexture }
-      applyMaterialToMesh(object2Mesh, combinedProps)
-    }
-  }, [object2Mesh, materialProps, combinedTexture, uvGenerated])
+      const material = new THREE.MeshStandardMaterial({
+        map: combinedTexture,
+        roughness: 0.4,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      })
 
-  if (!isReady || !bookScene) {
-    return null
-  }
+      // Apply polygon offset to prevent z-fighting
+      material.polygonOffset = true
+      material.polygonOffsetFactor = -1
+      material.polygonOffsetUnits = -1
+
+      object2Mesh.material = material
+      console.log("Applied combined texture to book cover")
+    }
+  }, [object2Mesh, combinedTexture, uvGenerated])
+
+  // Also apply textures to other parts if needed
+  useEffect(() => {
+    if (bookScene) {
+      const loader = new THREE.TextureLoader()
+
+      // Load spine texture
+      loader.load(book.spineUrl, (spineTexture) => {
+        spineTexture.minFilter = THREE.LinearFilter
+        spineTexture.magFilter = THREE.LinearFilter
+        spineTexture.generateMipmaps = false
+
+        bookScene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            // Apply spine texture to spine mesh if found
+            if (child.name.toLowerCase().includes("spine")) {
+              child.material = new THREE.MeshStandardMaterial({
+                map: spineTexture,
+                roughness: 0.4,
+                metalness: 0.05,
+              })
+            }
+            // Make pages white
+            else if (child.name.toLowerCase().includes("page") && child !== object2Mesh) {
+              child.material = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(0xffffff),
+                roughness: 0.9,
+                metalness: 0,
+              })
+            }
+
+            // Enable shadows for all meshes
+            child.castShadow = true
+            child.receiveShadow = true
+          }
+        })
+      })
+    }
+  }, [bookScene, book.spineUrl, object2Mesh])
+
+  useFrame((state, delta) => {
+    if (meshRef.current && autoRotate && !isDragging) {
+      meshRef.current.rotation.y += delta * rotationSpeed
+    }
+  })
+
+  if (!bookScene) return null
 
   return (
-    <primitive
-      ref={bookRef}
-      object={bookScene}
-      scale={params.scale}
-      position={params.position}
-      rotation={params.rotation}
-    />
+    <group
+      ref={meshRef}
+      scale={[2, 2, 2]}
+      position={[0, 0, 0]}
+      onPointerDown={() => {
+        setIsDragging(true)
+        onPointerDown?.()
+      }}
+      onPointerUp={() => {
+        setIsDragging(false)
+        onPointerUp?.()
+      }}
+      onPointerLeave={() => {
+        setIsDragging(false)
+        onPointerUp?.()
+      }}
+    >
+      <primitive object={bookScene} />
+    </group>
   )
 }
+
+useGLTF.preload("/models/book_red.glb")
