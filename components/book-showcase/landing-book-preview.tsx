@@ -2,31 +2,97 @@
 
 import { Canvas } from "@react-three/fiber"
 import { TrackballControls, Environment } from "@react-three/drei"
-import { Suspense, useRef } from "react"
+import { Suspense, useRef, useEffect, useState, useCallback } from "react"
 import { DutchAIBook } from "./dutch-ai-book"
 
 export default function LandingBookPreview() {
   const controlsRef = useRef<any>()
+  const [windowWidth, setWindowWidth] = useState(0)
+  const resizeTimeoutRef = useRef<NodeJS.Timeout>()
 
-  // Book parameters matching the example
-  const params = {
-    scale: [5, 5, 5],
-    position: [-3, -3, -3],
-    rotation: [1.2, 0, 0],
-    cameraPosition: [-4.2, -2.9, 0.4],
-    cameraFov: 30
+  useEffect(() => {
+    const handleResize = () => {
+      // Debounce resize events for better performance
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      resizeTimeoutRef.current = setTimeout(() => {
+        setWindowWidth(window.innerWidth)
+      }, 150)
+    }
+
+    // Set initial width immediately
+    setWindowWidth(window.innerWidth)
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Calculate responsive scale based on window width
+  const getScale = () => {
+    if (windowWidth < 480) return [2.8, 2.8, 2.8] // Extra small mobile
+    if (windowWidth < 640) return [3.2, 3.2, 3.2] // Small mobile
+    if (windowWidth < 768) return [3.8, 3.8, 3.8] // Large mobile
+    if (windowWidth < 1024) return [4.5, 4.5, 4.5] // Tablet
+    return [5, 5, 5] // Desktop
   }
+
+  const getPosition = () => {
+    if (windowWidth < 480) return [-1.5, -1.5, -1.5]
+    if (windowWidth < 640) return [-2, -2, -2]
+    if (windowWidth < 768) return [-2.5, -2.5, -2.5]
+    return [-3, -3, -3]
+  }
+
+  const getCameraPosition = () => {
+    if (windowWidth < 480) return [-3.0, -2.2, 0.25]
+    if (windowWidth < 640) return [-3.5, -2.5, 0.3]
+    if (windowWidth < 768) return [-3.8, -2.7, 0.35]
+    return [-4.2, -2.9, 0.4]
+  }
+
+  const getCameraFov = () => {
+    if (windowWidth < 480) return 40
+    if (windowWidth < 768) return 35
+    return 30
+  }
+
+  // Book parameters - responsive based on screen size
+  const params = {
+    scale: getScale(),
+    position: getPosition(),
+    rotation: [1.2, 0, 0],
+    cameraPosition: getCameraPosition(),
+    cameraFov: getCameraFov()
+  }
+
+  // Get device pixel ratio optimized for mobile
+  const getDpr = () => {
+    // Lower DPR for mobile devices to improve performance
+    if (windowWidth < 768) return [1, 1.5]
+    return [1, 2]
+  }
+
+  // Only render when we have a window width
+  if (windowWidth === 0) return null
 
   return (
     <div className="w-full h-full">
       <Canvas
+        key={`canvas-${Math.floor(windowWidth / 100) * 100}`} // Reduce re-renders
         className="w-full h-full"
         camera={{
           position: params.cameraPosition,
           fov: params.cameraFov
         }}
-        dpr={[1, 2]}
+        dpr={getDpr()}
         legacy={true}
+        performance={{ min: 0.5 }} // Performance optimization for mobile
       >
         <Suspense fallback={null}>
           {/* Lighting setup from example */}
@@ -49,7 +115,7 @@ export default function LandingBookPreview() {
             />
           </group>
 
-          {/* Interactive controls */}
+          {/* Interactive controls optimized for touch */}
           <TrackballControls
             ref={controlsRef}
             noPan={true}
@@ -57,8 +123,10 @@ export default function LandingBookPreview() {
             enableRotate={true}
             staticMoving={false}
             dynamicDampingFactor={0.05}
-            rotateSpeed={1.5}
+            rotateSpeed={windowWidth < 768 ? 2.0 : 1.5} // Faster rotation on mobile for better touch response
             target={params.position}
+            minDistance={5}
+            maxDistance={20}
           />
         </Suspense>
       </Canvas>

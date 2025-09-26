@@ -61,7 +61,7 @@ export default function CheckoutButton({
 
   const sizeClasses = variant === 'primary'
     ? 'text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-lg'
-    : 'text-xl py-4 px-12 rounded-xl shadow-xl'
+    : 'text-base sm:text-lg lg:text-xl py-3 sm:py-4 px-6 sm:px-8 lg:px-12 rounded-lg sm:rounded-xl shadow-lg sm:shadow-xl'
 
   const buttonClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses} ${className}`
 

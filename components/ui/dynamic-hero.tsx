@@ -81,6 +81,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     const animationFrameIdRef = useRef<number | null>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
     const [showVideo, setShowVideo] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     const resolvedCanvasColorsRef = useRef({
         strokeStyle: { r: 50, g: 160, b: 41 }, // FutureFlowAI green (#32a029)
@@ -291,14 +292,42 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     return (
         <div className="bg-white text-gray-700 min-h-screen flex flex-col">
             {showNav && (
-                <nav className="w-full bg-white border-b border-gray-100">
-                    <div className="container mx-auto px-6 sm:px-8 lg:px-12 py-3 sm:py-4">
-                        <div className="grid grid-cols-3 items-center">
+                <nav className="w-full bg-white border-b border-gray-100 relative">
+                    <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4">
+                        {/* Mobile Navigation */}
+                        <div className="flex items-center justify-between md:hidden">
+                            {/* Logo */}
+                            <img
+                                src="/images/FutureFlowAI Logo.webp"
+                                alt="FutureFlowAI"
+                                className="h-6 w-auto"
+                            />
+
+                            {/* Hamburger Menu Button */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="p-2 text-gray-700 hover:text-[#32a029] focus:outline-none"
+                                aria-label="Toggle menu"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Desktop Navigation */}
+                        <div className="hidden md:grid grid-cols-3 items-center">
                             {/* Left navigation items */}
-                            <div className="flex items-center justify-start gap-6 sm:gap-8">
+                            <div className="flex items-center justify-start gap-6 lg:gap-8">
                                 {defaultNavItems.map((item) => {
                                     const commonProps = {
-                                        className: "text-sm sm:text-base font-normal text-gray-700 hover:text-[#32a029] focus:outline-none focus:text-[#32a029] transition-all duration-200 ease-in-out whitespace-nowrap",
+                                        className: "text-sm lg:text-base font-normal text-gray-700 hover:text-[#32a029] focus:outline-none focus:text-[#32a029] transition-all duration-200 ease-in-out whitespace-nowrap",
                                         onClick: item.onClick,
                                     }
                                     if (item.href) {
@@ -321,15 +350,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                                 <img
                                     src="/images/FutureFlowAI Logo.webp"
                                     alt="FutureFlowAI"
-                                    className="h-5 sm:h-6 w-auto"
+                                    className="h-5 lg:h-6 w-auto"
                                 />
                             </div>
 
                             {/* Right navigation items */}
-                            <div className="flex items-center justify-end gap-6 sm:gap-8">
+                            <div className="flex items-center justify-end gap-6 lg:gap-8">
                                 {rightNavItems.map((item) => {
                                     const commonProps = {
-                                        className: "text-sm sm:text-base font-normal text-gray-700 hover:text-[#32a029] focus:outline-none focus:text-[#32a029] transition-all duration-200 ease-in-out whitespace-nowrap",
+                                        className: "text-sm lg:text-base font-normal text-gray-700 hover:text-[#32a029] focus:outline-none focus:text-[#32a029] transition-all duration-200 ease-in-out whitespace-nowrap",
                                         onClick: item.onClick,
                                     }
                                     if (item.href) {
@@ -347,11 +376,38 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                                 })}
                             </div>
                         </div>
+
+                        {/* Mobile Dropdown Menu - Absolutely positioned */}
+                        {isMobileMenuOpen && (
+                            <div className="absolute top-full left-0 right-0 md:hidden bg-white border-b border-gray-100 shadow-lg z-50 py-2">
+                                {[...defaultNavItems, ...rightNavItems].map((item) => {
+                                    const commonProps = {
+                                        className: "block w-full text-left px-6 py-3 text-gray-700 hover:text-[#32a029] hover:bg-gray-50 transition-all duration-200",
+                                        onClick: () => {
+                                            item.onClick?.()
+                                            setIsMobileMenuOpen(false)
+                                        },
+                                    }
+                                    if (item.href) {
+                                        return (
+                                            <a key={item.id} href={item.href} target={item.target} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined} {...commonProps}>
+                                                {item.label}
+                                            </a>
+                                        )
+                                    }
+                                    return (
+                                        <button key={item.id} type="button" {...commonProps}>
+                                            {item.label}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
                     </div>
                 </nav>
             )}
 
-            <main className="flex-grow flex flex-col items-center justify-center pt-12 sm:pt-16">
+            <main className="flex-grow flex flex-col items-center justify-center pt-6 sm:pt-12 md:pt-16">
                 <div className="flex flex-col items-center">
                     <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-center px-4 leading-tight">
                         {heading.split(' ').map((word, i) => (
@@ -443,7 +499,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
             </main>
 
-            <div className="h-12 sm:h-16 md:h-20"></div>
+            <div className="h-6 sm:h-12 md:h-20"></div>
             <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-10"></canvas>
         </div>
     )
