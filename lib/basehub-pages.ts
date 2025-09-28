@@ -38,11 +38,11 @@ export async function getAllLandingPages(): Promise<LandingPageInfo[]> {
         }
       })
 
-      if (data.landingPage?.pageConfig?.customSlug) {
+      if ((data as any).landingPage?.pageConfig?.customSlug) {
         pages.push({
-          slug: data.landingPage.pageConfig.customSlug,
+          slug: (data as any).landingPage.pageConfig.customSlug,
           branch: branch,
-          title: data.landingPage.heroSection?.mainTitle,
+          title: (data as any).landingPage.heroSection?.mainTitle,
           description: `Branch: ${branch}`
         })
       }

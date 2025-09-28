@@ -6,7 +6,7 @@ import { HeroSection } from "@/components/ui/dynamic-hero"
 import CheckoutButton from "@/components/ui/checkout-button"
 import { stripeService } from "@/lib/services/stripe.service"
 import { logger } from "@/lib/utils/logger"
-import "../landing/fonts.css"
+// Font import removed - fonts handled globally
 
 const LandingBookPreview = dynamic(
   () => import("@/components/book-showcase/landing-book-preview"),
@@ -68,13 +68,12 @@ export default function ConsultingLandingClient({ pageData, selectedVariant }: C
 
       {/* Hero Section with original design */}
       <HeroSection
-        title={heroContent.mainTitle}
-        subtitle={heroContent.subtitle}
-        ctaText={heroContent.ctaText}
-        onCTAClick={handleCTAClick}
+        heading={heroContent.mainTitle}
+        tagline={heroContent.subtitle}
+        buttonText={heroContent.ctaText}
+        onButtonClick={handleCTAClick}
         videoUrl={videoUrl}
         originalPrice={pageData.sharedContent.originalPrice}
-        discountPrice={pageData.sharedContent.discountPrice}
       />
 
       {/* 3D Book Preview Section */}
@@ -137,9 +136,10 @@ export default function ConsultingLandingClient({ pageData, selectedVariant }: C
               <span className="text-5xl font-bold">€{pageData.sharedContent.discountPrice}</span>
             </div>
             <CheckoutButton
-              text={heroContent.ctaText}
               className="w-full bg-white text-[#32a029] hover:bg-gray-100 font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105"
-            />
+            >
+              {heroContent.ctaText}
+            </CheckoutButton>
             <p className="text-sm text-white/80 mt-4">
               30 dagen geld-terug-garantie
             </p>

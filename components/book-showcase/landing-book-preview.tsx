@@ -34,7 +34,7 @@ export default function LandingBookPreview() {
   }, [])
 
   // Calculate responsive scale based on window width
-  const getScale = () => {
+  const getScale = (): [number, number, number] => {
     if (windowWidth < 480) return [2.8, 2.8, 2.8] // Extra small mobile
     if (windowWidth < 640) return [3.2, 3.2, 3.2] // Small mobile
     if (windowWidth < 768) return [3.8, 3.8, 3.8] // Large mobile
@@ -42,14 +42,14 @@ export default function LandingBookPreview() {
     return [5, 5, 5] // Desktop
   }
 
-  const getPosition = () => {
+  const getPosition = (): [number, number, number] => {
     if (windowWidth < 480) return [-1.5, -1.5, -1.5]
     if (windowWidth < 640) return [-2, -2, -2]
     if (windowWidth < 768) return [-2.5, -2.5, -2.5]
     return [-3, -3, -3]
   }
 
-  const getCameraPosition = () => {
+  const getCameraPosition = (): [number, number, number] => {
     if (windowWidth < 480) return [-3.0, -2.2, 0.25]
     if (windowWidth < 640) return [-3.5, -2.5, 0.3]
     if (windowWidth < 768) return [-3.8, -2.7, 0.35]
@@ -66,13 +66,13 @@ export default function LandingBookPreview() {
   const params = {
     scale: getScale(),
     position: getPosition(),
-    rotation: [1.2, 0, 0],
+    rotation: [1.2, 0, 0] as [number, number, number],
     cameraPosition: getCameraPosition(),
     cameraFov: getCameraFov()
   }
 
   // Get device pixel ratio optimized for mobile
-  const getDpr = () => {
+  const getDpr = (): [number, number] => {
     // Lower DPR for mobile devices to improve performance
     if (windowWidth < 768) return [1, 1.5]
     return [1, 2]
@@ -120,7 +120,6 @@ export default function LandingBookPreview() {
             ref={controlsRef}
             noPan={true}
             noZoom={true}
-            enableRotate={true}
             staticMoving={false}
             dynamicDampingFactor={0.05}
             rotateSpeed={windowWidth < 768 ? 2.0 : 1.5} // Faster rotation on mobile for better touch response

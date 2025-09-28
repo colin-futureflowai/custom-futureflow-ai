@@ -64,17 +64,18 @@ class StripeService {
   }
 
   /**
-   * Get the current mode (test or live)
+   * Get the current mode (test or live) based on the keys
    */
   getMode(): 'test' | 'live' {
-    return stripeConfig.mode as 'test' | 'live'
+    // Determine mode based on the publishable key prefix
+    return stripeConfig.publishableKey.startsWith('pk_test_') ? 'test' : 'live'
   }
 
   /**
    * Check if we're in test mode
    */
   isTestMode(): boolean {
-    return stripeConfig.mode === 'test'
+    return this.getMode() === 'test'
   }
 }
 
