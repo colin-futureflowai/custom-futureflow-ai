@@ -16,7 +16,7 @@ export const stripeConfig = {
   // Product & Price IDs - Should be set via environment variables
   productId: process.env.STRIPE_PRODUCT_ID || 'prod_T6kAkhn34VNhQR',
 
-  priceId: process.env.STRIPE_PRICE_ID || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1SAWfoCW4Z5hR3AWmpc4gh7W',
+  priceId: process.env.STRIPE_PRICE_ID || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1SCNCwCjh2scZSeWZ6RGollE',
 
   // URLs - Using NEXT_PUBLIC_BASE_URL for production
   successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
