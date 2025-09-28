@@ -7,11 +7,5 @@
     "app/api/checkout/route.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "BASEHUB_TOKEN": "@basehub-token",
-    "STRIPE_SECRET_KEY": "@stripe-secret-key",
-    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "@stripe-publishable-key",
-    "NEXT_PUBLIC_BASE_URL": "@base-url"
   }
 }
