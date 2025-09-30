@@ -7,7 +7,6 @@ import "./fonts.css"
 export const metadata: Metadata = {
   title: "Gewoon Beginnen met AI - FutureFlowAI",
   description: "Praktische gids voor ondernemers die willen starten met AI zonder technische kennis",
-  generator: "v0.dev",
   icons: {
     icon: [
       { url: '/images/favicon.png', type: 'image/png' },
