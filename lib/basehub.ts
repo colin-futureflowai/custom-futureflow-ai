@@ -245,6 +245,8 @@ export interface LandingPageContent {
 }
 
 // Fetch landing page manager content from BaseHub (new structure)
+// NOTE: This query only includes fields that currently exist in BaseHub
+// Additional fields like whyBenefits, successStory, etc. will be added later
 export async function getLandingPageManager(): Promise<LandingPageManagerContent | null> {
   try {
     const client = getBasehubClient()
@@ -279,32 +281,15 @@ export async function getLandingPageManager(): Promise<LandingPageManagerContent
             author: true,
             pageCount: true,
             publishYear: true,
-            whyQuote: true,
-            whyBenefits: {
-              title: true,
-              description: true,
-            },
-            successStory: {
-              title: true,
-              stat1Value: true,
-              stat1Label: true,
-              stat2Value: true,
-              stat2Label: true,
-              stat3Value: true,
-              stat3Label: true,
-              quote: true,
-            },
-            preorderBenefits: {
-              title: true,
-              description: true,
-            },
-            faqItems: {
-              question: true,
-              answer: true,
-            },
-            footerText: true,
-            guaranteeText: true,
-            urgencyText: true,
+            // These fields don't exist yet in BaseHub:
+            // whyQuote: true,
+            // whyBenefits: { title: true, description: true },
+            // successStory: { ... },
+            // preorderBenefits: { ... },
+            // faqItems: { ... },
+            // footerText: true,
+            // guaranteeText: true,
+            // urgencyText: true,
             contentSections: {
               sectionTitle: true,
               contentDescription: true,
