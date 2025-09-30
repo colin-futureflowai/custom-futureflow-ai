@@ -12,6 +12,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["'BR Sonoma'", "-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto", '"Helvetica Neue"', "Arial", "sans-serif"],
+        mono: ['"Courier New"', "monospace"],
+      },
+      fontWeight: {
+        normal: '500', // BR Sonoma Medium
+        medium: '500', // BR Sonoma Medium
+        semibold: '600', // BR Sonoma SemiBold
+        bold: '600', // BR Sonoma SemiBold
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

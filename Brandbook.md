@@ -20,9 +20,29 @@
 
 **Primair Lettertype:** BR Sonoma
 
+### Font Files
+- **BR Sonoma Medium** (`BRSonoma-Medium-BF654c45266edd1.otf`) - Weight 500
+- **BR Sonoma SemiBold** (`BRSonoma-SemiBold-BF654c45268c340.otf`) - Weight 600
+
+### Gebruik
+- **Body Text**: BR Sonoma Medium (500) - Standaard voor alle tekst
+- **Headings**: BR Sonoma SemiBold (600) - Voor h1-h6 en nadruk
+- **Buttons**: BR Sonoma SemiBold (600) - Voor call-to-actions
+- **Navigation**: BR Sonoma Medium (500) - Voor menu items
+- **Emphasis**: BR Sonoma SemiBold (600) - Voor strong/bold tekst
+
+### Technische Implementatie
+```css
+font-family: 'BR Sonoma', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+```
+
+### Font Weights Mapping
+- `font-weight: 500` → BR Sonoma Medium (normale tekst)
+- `font-weight: 600` → BR Sonoma SemiBold (nadruk, koppen)
+
 ### Voorbeelden
-- **Aa** - Hoofdletters en kleine letters
-- **Aa** - Cursieve varianten beschikbaar
+- **Aa** - BR Sonoma Medium
+- **Aa** - BR Sonoma SemiBold
 
 ---
 
@@ -83,6 +103,8 @@ De merkpersoonlijheid van FutureFlowAI positioneert zich als volgt op deze schal
 - Zwart (#000000) spaarzaam gebruiken voor extra contrast
 
 ### Typografie
-- BR Sonoma voor alle merkmateriaal
-- Gebruik consistent lettertype voor merkherkenning
-- Varieer met gewichten maar blijf binnen de BR Sonoma familie
+- BR Sonoma Medium (500) voor alle body text en standaard content
+- BR Sonoma SemiBold (600) voor koppen, buttons en nadruk
+- Gebruik alleen deze twee font weights voor consistentie
+- Geen andere fonts of weights toevoegen zonder overleg
+- Fallback fonts alleen voor systeemcompatibiliteit

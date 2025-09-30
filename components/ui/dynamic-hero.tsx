@@ -82,10 +82,57 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     const videoRef = useRef<HTMLVideoElement>(null)
     const [showVideo, setShowVideo] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [activeSection, setActiveSection] = useState('home')
 
     const resolvedCanvasColorsRef = useRef({
         strokeStyle: { r: 50, g: 160, b: 41 }, // FutureFlowAI green (#32a029)
     })
+
+    // Scroll-spy effect to detect active section
+    useEffect(() => {
+        const handleScroll = () => {
+            // Find active section based on scroll position
+            const sections = navItems.map(item => {
+                // Skip the home link which is just '#'
+                if (item.href === '#') {
+                    return null
+                }
+                const element = document.querySelector(item.href || '')
+                if (element) {
+                    const rect = element.getBoundingClientRect()
+                    return {
+                        id: item.id,
+                        top: rect.top,
+                        bottom: rect.bottom
+                    }
+                }
+                return null
+            }).filter(Boolean)
+
+            // Find which section is currently in view
+            const windowHeight = window.innerHeight
+            const viewportCenter = windowHeight / 3 // Check at 1/3 from top for earlier detection
+
+            for (const section of sections) {
+                if (section && section.top <= viewportCenter && section.bottom >= viewportCenter) {
+                    setActiveSection(section.id)
+                    break
+                }
+            }
+
+            // If at top of page, set to home
+            if (window.scrollY < 100) {
+                setActiveSection('home')
+            }
+        }
+
+        // Initial check
+        handleScroll()
+
+        // Add scroll listener
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [navItems])
 
     useEffect(() => {
         const tempElement = document.createElement('div')
@@ -280,6 +327,34 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         }
     }
 
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string | undefined) => {
+        if (!href) return
+
+        e.preventDefault()
+
+        // Close mobile menu if open
+        setIsMobileMenuOpen(false)
+
+        // Special handling for home
+        if (href === '#') {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            return
+        }
+
+        // Scroll to section
+        const element = document.querySelector(href)
+        if (element) {
+            const offset = 80 // Account for fixed nav height
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+            const offsetPosition = elementPosition - offset
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            })
+        }
+    }
+
     const handleCTAClick = () => {
         if (onButtonClick) {
             onButtonClick()
@@ -322,54 +397,45 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                         </div>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:grid grid-cols-3 items-center">
-                            {/* Left navigation items */}
-                            <div className="flex items-center justify-start gap-6 lg:gap-8">
-                                {defaultNavItems.map((item) => {
-                                    const commonProps = {
-                                        className: "text-sm lg:text-base font-normal text-gray-700 hover:text-[#32a029] focus:outline-none focus:text-[#32a029] transition-all duration-200 ease-in-out whitespace-nowrap",
-                                        onClick: item.onClick,
-                                    }
+                        <div className="hidden md:flex items-center justify-between">
+                            {/* Logo on the left */}
+                            <img
+                                src="/images/FutureFlowAI Logo.webp"
+                                alt="FutureFlowAI"
+                                className="h-5 lg:h-6 w-auto"
+                            />
+
+                            {/* Navigation items in the center/right */}
+                            <div className="flex items-center gap-6 lg:gap-8">
+                                {navItems.map((item) => {
+                                    const isActive = activeSection === item.id
+                                    const className = `text-sm lg:text-base font-normal transition-all duration-200 ease-in-out whitespace-nowrap ${
+                                        isActive
+                                            ? 'text-[#32a029] font-semibold'
+                                            : 'text-gray-700 hover:text-[#32a029]'
+                                    } focus:outline-none focus:text-[#32a029]`
+
                                     if (item.href) {
                                         return (
-                                            <a key={item.id} href={item.href} target={item.target} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined} {...commonProps}>
+                                            <a
+                                                key={item.id}
+                                                href={item.href}
+                                                target={item.target}
+                                                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                                                className={className}
+                                                onClick={(e) => handleNavClick(e, item.href)}
+                                            >
                                                 {item.label}
                                             </a>
                                         )
                                     }
                                     return (
-                                        <button key={item.id} type="button" {...commonProps}>
-                                            {item.label}
-                                        </button>
-                                    )
-                                })}
-                            </div>
-
-                            {/* Center logo */}
-                            <div className="flex items-center justify-center">
-                                <img
-                                    src="/images/FutureFlowAI Logo.webp"
-                                    alt="FutureFlowAI"
-                                    className="h-5 lg:h-6 w-auto"
-                                />
-                            </div>
-
-                            {/* Right navigation items */}
-                            <div className="flex items-center justify-end gap-6 lg:gap-8">
-                                {rightNavItems.map((item) => {
-                                    const commonProps = {
-                                        className: "text-sm lg:text-base font-normal text-gray-700 hover:text-[#32a029] focus:outline-none focus:text-[#32a029] transition-all duration-200 ease-in-out whitespace-nowrap",
-                                        onClick: item.onClick,
-                                    }
-                                    if (item.href) {
-                                        return (
-                                            <a key={item.id} href={item.href} target={item.target} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined} {...commonProps}>
-                                                {item.label}
-                                            </a>
-                                        )
-                                    }
-                                    return (
-                                        <button key={item.id} type="button" {...commonProps}>
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            className={className}
+                                            onClick={item.onClick}
+                                        >
                                             {item.label}
                                         </button>
                                     )
@@ -380,23 +446,41 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                         {/* Mobile Dropdown Menu - Absolutely positioned */}
                         {isMobileMenuOpen && (
                             <div className="absolute top-full left-0 right-0 md:hidden bg-white border-b border-gray-100 shadow-lg z-50 py-2">
-                                {[...defaultNavItems, ...rightNavItems].map((item) => {
-                                    const commonProps = {
-                                        className: "block w-full text-left px-6 py-3 text-gray-700 hover:text-[#32a029] hover:bg-gray-50 transition-all duration-200",
-                                        onClick: () => {
-                                            item.onClick?.()
-                                            setIsMobileMenuOpen(false)
-                                        },
-                                    }
+                                {navItems.map((item) => {
+                                    const isActive = activeSection === item.id
+                                    const className = `block w-full text-left px-6 py-3 transition-all duration-200 ${
+                                        isActive
+                                            ? 'text-[#32a029] bg-gray-50 font-semibold'
+                                            : 'text-gray-700 hover:text-[#32a029] hover:bg-gray-50'
+                                    }`
+
                                     if (item.href) {
                                         return (
-                                            <a key={item.id} href={item.href} target={item.target} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined} {...commonProps}>
+                                            <a
+                                                key={item.id}
+                                                href={item.href}
+                                                target={item.target}
+                                                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                                                className={className}
+                                                onClick={(e) => {
+                                                    handleNavClick(e, item.href)
+                                                    setIsMobileMenuOpen(false)
+                                                }}
+                                            >
                                                 {item.label}
                                             </a>
                                         )
                                     }
                                     return (
-                                        <button key={item.id} type="button" {...commonProps}>
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            className={className}
+                                            onClick={() => {
+                                                item.onClick?.()
+                                                setIsMobileMenuOpen(false)
+                                            }}
+                                        >
                                             {item.label}
                                         </button>
                                     )

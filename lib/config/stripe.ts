@@ -19,8 +19,8 @@ export const stripeConfig = {
   priceId: process.env.STRIPE_PRICE_ID || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1SCNCwCjh2scZSeWZ6RGollE',
 
   // URLs - Using NEXT_PUBLIC_BASE_URL for production
-  successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
-  cancelUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/landing`,
+  successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}&preorder=true`,
+  cancelUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/recovery/discount?session_id={CHECKOUT_SESSION_ID}&abandoned=true`,
 
   // Settings
   locale: 'nl' as const,

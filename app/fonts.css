@@ -1,0 +1,22 @@
+/* BR Sonoma Font Declarations */
+
+@font-face {
+  font-family: 'BR Sonoma';
+  src: url('/fonts/br-sonoma-font-family-1758593106-0/BRSonoma-Medium-BF654c45266edd1.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BR Sonoma';
+  src: url('/fonts/br-sonoma-font-family-1758593106-0/BRSonoma-SemiBold-BF654c45268c340.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Set BR Sonoma as the default font */
+:root {
+  --font-br-sonoma: 'BR Sonoma', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}

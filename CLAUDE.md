@@ -5,6 +5,7 @@ Building a conversion-focused landing page for the pre-order of the e-book "Gewo
 
 ## Key Project Files
 - `LOGBOOK.md` - **SESSION TRACKING: Always read and update this file**
+- `SITE_STRUCTURE.md` - **IMPORTANT: Update this when adding pages or changing BaseHub structure**
 - `LandingsPaginaBeschrijving.md` - Complete landing page requirements and structure
 - `Brandbook.md` - FutureFlowAI brand guidelines
 - `components/book-showcase/` - 3D book component to be integrated
@@ -191,8 +192,25 @@ npm run lint
 - Consider using Vercel for deployment (Next.js native)
 - Payment integration will need separate setup (Stripe/Mollie)
 
+## Important Maintenance Tasks
+
+### SITE_STRUCTURE.md Updates Required When:
+1. **Adding new pages** - Update the page structure section
+2. **Adding new BaseHub content** - Update the dynamic landing pages section
+3. **Changing URL slugs** - Update the generated routes table
+4. **Adding integrations** - Update the third-party integrations section
+5. **Modifying checkout flow** - Update the checkout flow section
+6. **Creating new components** - Update the component structure section
+
+### Always Check and Update:
+- Page status (✅ Active, 📝 Content needed, 🔄 Planned)
+- Last updated date at the top of SITE_STRUCTURE.md
+- Todo/Roadmap section for completed tasks
+- Environment variables if new services are added
+
 ## Resources
 - Book content: Available in project files
 - Brand assets: Follow Brandbook.md guidelines
 - 3D Models: Already configured in `/public/models/`
 - Book covers: Available in `/public/images/dutch-ai-*.jpeg`
+- Site structure: See SITE_STRUCTURE.md for complete overview

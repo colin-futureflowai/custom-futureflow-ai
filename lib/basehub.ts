@@ -46,6 +46,39 @@ export interface LandingPageManagerContent {
         discountPrice: number
         bookTitle: string
         author: string
+        pageCount?: number
+        publishYear?: number
+        // Why section
+        whyQuote?: string
+        whyBenefits?: Array<{
+          title: string
+          description: string
+        }>
+        // Success story
+        successStory?: {
+          title: string
+          stat1Value: string
+          stat1Label: string
+          stat2Value: string
+          stat2Label: string
+          stat3Value: string
+          stat3Label: string
+          quote: string
+        }
+        // Pre-order benefits
+        preorderBenefits?: Array<{
+          title: string
+          description: string
+        }>
+        // FAQ section
+        faqItems?: Array<{
+          question: string
+          answer: string
+        }>
+        // Footer
+        footerText?: string
+        guaranteeText?: string
+        urgencyText?: string
         contentSections?: {
           sectionTitle: string
           contentDescription: string
@@ -244,6 +277,34 @@ export async function getLandingPageManager(): Promise<LandingPageManagerContent
             discountPrice: true,
             bookTitle: true,
             author: true,
+            pageCount: true,
+            publishYear: true,
+            whyQuote: true,
+            whyBenefits: {
+              title: true,
+              description: true,
+            },
+            successStory: {
+              title: true,
+              stat1Value: true,
+              stat1Label: true,
+              stat2Value: true,
+              stat2Label: true,
+              stat3Value: true,
+              stat3Label: true,
+              quote: true,
+            },
+            preorderBenefits: {
+              title: true,
+              description: true,
+            },
+            faqItems: {
+              question: true,
+              answer: true,
+            },
+            footerText: true,
+            guaranteeText: true,
+            urgencyText: true,
             contentSections: {
               sectionTitle: true,
               contentDescription: true,
