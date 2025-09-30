@@ -143,6 +143,17 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
     quote: "Dit zijn de resultaten die mogelijk zijn als je AI op de juiste manier inzet in je organisatie."
   }
 
+  // Get guarantee, urgency and footer text from BaseHub (needed for preorderBenefits)
+  const guaranteeText = pageData.sharedContent?.guaranteeText || (
+    landingType === 'workshop' ? '100% tevredenheidsgarantie' :
+    landingType === 'consulting' ? 'Resultaat gegarandeerd' :
+    '30 dagen geld-terug-garantie'
+  )
+
+  const urgencyText = pageData.sharedContent?.urgencyText || '⏰ Let op: De komende twee jaar bepalen welke bedrijven voorop blijven lopen met AI'
+
+  const footerText = pageData.sharedContent?.footerText || 'Wij zetten ons in om repetitieve taken binnen 2 weken te automatiseren zonder uw huidige systemen te vervangen.'
+
   // Get Pre-order benefits from BaseHub
   const preorderBenefits = pageData.sharedContent?.preorderBenefits || [
     {
@@ -215,33 +226,19 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
     }
   ]
 
-  // Get guarantee and urgency text from BaseHub
-  const guaranteeText = pageData.sharedContent?.guaranteeText || (
-    landingType === 'workshop' ? '100% tevredenheidsgarantie' :
-    landingType === 'consulting' ? 'Resultaat gegarandeerd' :
-    '30 dagen geld-terug-garantie'
-  )
-
-  const urgencyText = pageData.sharedContent?.urgencyText || '⏰ Let op: De komende twee jaar bepalen welke bedrijven voorop blijven lopen met AI'
-
-  const footerText = pageData.sharedContent?.footerText || 'Wij zetten ons in om repetitieve taken binnen 2 weken te automatiseren zonder uw huidige systemen te vervangen.'
-
   // Get content-specific text based on landing type (keeping for other uses)
   let contentType = "hoofdstukken"
   let whyTitle = "Waarom Dit Boek?"
   let ctaTitle = "Pre-order Nu Met Korting"
-  let guaranteeText = "30 dagen geld-terug-garantie"
 
   if (landingType === 'workshop') {
     contentType = "modules"
     whyTitle = "Waarom Deze Workshop?"
     ctaTitle = "Reserveer Nu Met Korting"
-    guaranteeText = "100% tevredenheidsgarantie"
   } else if (landingType === 'consulting') {
     contentType = "fasen"
     whyTitle = "Waarom Onze Consulting?"
     ctaTitle = "Start Nu Met Korting"
-    guaranteeText = "Resultaat gegarandeerd"
   }
 
   // Define navigation items
@@ -376,7 +373,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
             </blockquote>
 
             <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-              {whyBenefits.map((benefit, index) => (
+              {whyBenefits.map((benefit: { title: string; description: string }, index: number) => (
                 <div key={index} className="bg-[#F9FAFB] rounded-lg p-4 sm:p-6">
                   <h3 className="text-lg sm:text-xl font-semibold text-[#3D3D3D] mb-2 sm:mb-3">
                     ✓ {benefit.title}
@@ -454,7 +451,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
             </div>
 
             <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-              {preorderBenefits.map((benefit, index) => (
+              {preorderBenefits.map((benefit: { title: string; description: string }, index: number) => (
                 <div key={index} className="flex items-start gap-2 sm:gap-3">
                   <span className="text-[#32a029] text-lg sm:text-xl">✓</span>
                   <div>
@@ -500,7 +497,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
           </h2>
 
           <div className="space-y-4 sm:space-y-6">
-            {faqItems.map((faq, index) => (
+            {faqItems.map((faq: { question: string; answer: string }, index: number) => (
               <div key={index} className="bg-[#F9FAFB] rounded-lg p-4 sm:p-6">
                 <h3 className="font-semibold text-sm sm:text-base text-[#3D3D3D] mb-2">
                   {faq.question}
