@@ -186,11 +186,11 @@ function RecoveryDiscountContent() {
           </p>
         </div>
 
-        {/* Trust Badges */}
-        <div className="flex justify-center items-center gap-8 mt-12 opacity-60">
-          <img src="/images/trust-badge-1.svg" alt="Trusted" className="h-12" />
-          <img src="/images/trust-badge-2.svg" alt="Secure" className="h-12" />
-          <img src="/images/trust-badge-3.svg" alt="Guaranteed" className="h-12" />
+        {/* Trust Text */}
+        <div className="flex justify-center items-center gap-8 mt-12 text-gray-500 text-sm">
+          <span>✓ Veilig betalen</span>
+          <span>✓ Direct toegang</span>
+          <span>✓ 30 dagen garantie</span>
         </div>
       </div>
     </div>
