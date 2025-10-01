@@ -1,15 +1,20 @@
 # Vercel Environment Variables Setup
 
-## BELANGRIJK: Custom Domain Configuration
+## BELANGRIJK: Custom Domain Configuration - VERBETERDE VERSIE
 
-Om ervoor te zorgen dat Stripe redirects naar je custom domein werken (en niet naar de oude Vercel URL), moet je de volgende environment variable instellen in Vercel:
+De applicatie detecteert nu automatisch je custom domein! Maar voor de beste betrouwbaarheid, stel alsnog de environment variable in:
 
-### Stap 1: Ga naar Vercel Dashboard
+### Automatische Detectie (NIEUW!)
+De applicatie detecteert nu automatisch of je een custom domein gebruikt en past de Stripe redirect URLs daarop aan. Dit betekent dat het **direct zou moeten werken** met je custom domein zonder extra configuratie.
+
+### Voor Optimale Betrouwbaarheid
+
+#### Stap 1: Ga naar Vercel Dashboard
 1. Log in op [Vercel](https://vercel.com)
 2. Selecteer je project
 3. Ga naar "Settings" → "Environment Variables"
 
-### Stap 2: Voeg NEXT_PUBLIC_BASE_URL toe
+#### Stap 2: Voeg NEXT_PUBLIC_BASE_URL toe (OPTIONEEL maar aanbevolen)
 Voeg de volgende environment variable toe:
 
 ```
@@ -23,16 +28,21 @@ Value: https://jouw-custom-domein.com
   NEXT_PUBLIC_BASE_URL=https://gewoonbeginnenmetai.nl
   ```
 
-### Stap 3: Belangrijk - GEEN trailing slash!
+#### Stap 3: Belangrijk - GEEN trailing slash!
 Zorg ervoor dat je URL GEEN `/` aan het einde heeft:
 - ✅ Goed: `https://gewoonbeginnenmetai.nl`
 - ❌ Fout: `https://gewoonbeginnenmetai.nl/`
 
-### Stap 4: Deploy opnieuw
+#### Stap 4: Deploy opnieuw
 Na het toevoegen van de environment variable:
 1. Ga naar "Deployments"
 2. Klik op de drie puntjes bij je laatste deployment
 3. Kies "Redeploy"
+
+### Hoe Het Werkt
+1. **Met NEXT_PUBLIC_BASE_URL**: Gebruikt altijd je custom domein voor redirects
+2. **Zonder NEXT_PUBLIC_BASE_URL**: Detecteert automatisch het domein van de huidige request
+3. **Fallback**: Als je op een Vercel preview URL zit in productie, gebruikt het automatisch `gewoonbeginnenmetai.nl`
 
 ## Andere belangrijke Environment Variables
 

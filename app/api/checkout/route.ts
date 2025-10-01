@@ -8,16 +8,54 @@ const stripe = new Stripe(stripeConfig.secretKey, {
   apiVersion: '2025-08-27.basil',
 })
 
+// Get the base URL dynamically from the request
+function getBaseUrl(request: NextRequest): string {
+  // First priority: Custom domain set in environment
+  if (process.env.NEXT_PUBLIC_BASE_URL && process.env.NEXT_PUBLIC_BASE_URL !== 'http://localhost:3000') {
+    return process.env.NEXT_PUBLIC_BASE_URL
+  }
+
+  // Second priority: Get from request headers (works with custom domains)
+  const host = request.headers.get('host')
+  const protocol = request.headers.get('x-forwarded-proto') || 'https'
+
+  if (host) {
+    // Check if this is a Vercel preview URL (contains project ID)
+    const isVercelPreview = host.includes('.vercel.app') && (
+      host.includes('-') && host.split('-').length > 2
+    )
+
+    // If it's a production deployment but still using Vercel URL, use fallback
+    if (isVercelPreview && process.env.VERCEL_ENV === 'production') {
+      // Use the expected production domain
+      console.warn('⚠️ Production deployment without NEXT_PUBLIC_BASE_URL set! Using fallback domain.')
+      return 'https://gewoonbeginnenmetai.nl'
+    }
+
+    // Otherwise use the actual host
+    return `${protocol}://${host}`
+  }
+
+  // Fallback
+  return 'http://localhost:3000'
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { priceId } = await request.json()
+
+    // Get dynamic base URL
+    const baseUrl = getBaseUrl(request)
 
     // Log environment check
     console.log('[Stripe] Environment check:', {
       hasSecretKey: !!stripeConfig.secretKey,
       secretKeyPrefix: stripeConfig.secretKey?.substring(0, 7),
       priceId: priceId,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
+      baseUrl: baseUrl,
+      host: request.headers.get('host'),
+      vercelEnv: process.env.VERCEL_ENV
     })
 
     // Validate price ID
@@ -39,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     logger.info(`[Stripe] Creating checkout session for price:`, priceId)
 
-    // Create Stripe checkout session with config
+    // Create Stripe checkout session with dynamic URLs
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: [...stripeConfig.paymentMethods] as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
@@ -49,8 +87,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: stripeConfig.successUrl,
-      cancel_url: stripeConfig.cancelUrl,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&preorder=true`,
+      cancel_url: `${baseUrl}/recovery/discount?session_id={CHECKOUT_SESSION_ID}&abandoned=true`,
       metadata: {
         product: 'Gewoon Beginnen met AI E-book',
         environment: process.env.NODE_ENV || 'production',
