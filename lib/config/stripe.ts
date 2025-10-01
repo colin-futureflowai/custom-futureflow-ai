@@ -28,7 +28,7 @@ function getBaseUrl() {
     }
     // Fallback for server-side - this should be replaced with NEXT_PUBLIC_BASE_URL
     console.warn('⚠️ NEXT_PUBLIC_BASE_URL not set in production! Please configure your custom domain.')
-    return 'https://gewoonbeginnenmetai.nl' // Fallback to expected domain
+    return 'https://gewoonbeginnenmetai.futureflowai.nl' // Fallback to expected domain
   }
 
   // For preview deployments, use VERCEL_URL

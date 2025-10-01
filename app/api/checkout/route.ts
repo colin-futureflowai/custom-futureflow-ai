@@ -29,7 +29,7 @@ function getBaseUrl(request: NextRequest): string {
     if (isVercelPreview && process.env.VERCEL_ENV === 'production') {
       // Use the expected production domain
       console.warn('⚠️ Production deployment without NEXT_PUBLIC_BASE_URL set! Using fallback domain.')
-      return 'https://gewoonbeginnenmetai.nl'
+      return 'https://gewoonbeginnenmetai.futureflowai.nl'
     }
 
     // Otherwise use the actual host
