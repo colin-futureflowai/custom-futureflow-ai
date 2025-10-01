@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import GTMService from '@/lib/services/gtm.service'
 
 // Success page content component
 function SuccessContent() {
@@ -12,10 +13,33 @@ function SuccessContent() {
   const [showConfetti, setShowConfetti] = useState(true)
 
   useEffect(() => {
+    // Track conversion in GTM
+    if (sessionId && isPreorder) {
+      const price = 27 // Pre-order price
+      const abVariant = localStorage.getItem('ab_variant') || undefined
+
+      // Track the purchase/conversion
+      GTMService.trackPurchase({
+        transactionId: sessionId,
+        value: price,
+        currency: 'EUR',
+        variant: abVariant
+      })
+
+      // Log for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Success Page] Conversion tracked:', {
+          sessionId,
+          price,
+          variant: abVariant
+        })
+      }
+    }
+
     // Hide confetti after 5 seconds
     const timer = setTimeout(() => setShowConfetti(false), 5000)
     return () => clearTimeout(timer)
-  }, [])
+  }, [sessionId, isPreorder])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">

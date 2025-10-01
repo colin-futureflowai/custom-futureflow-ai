@@ -59,11 +59,11 @@ export default function ABTestRedirect({ variants }: ABTestRedirectProps) {
       localStorage.setItem('ab_timestamp', Date.now().toString())
     }
 
-    // Track the selection (for analytics)
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'ab_test_assignment', {
-        variant: variant,
-        timestamp: new Date().toISOString()
+    // Track the selection in GTM
+    if (typeof window !== 'undefined') {
+      // Import GTMService dynamically to avoid SSR issues
+      import('@/lib/services/gtm.service').then(({ default: GTMService }) => {
+        GTMService.trackABTestAssignment(variant)
       })
     }
 

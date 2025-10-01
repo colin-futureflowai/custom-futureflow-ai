@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import ClientLayout from "./client-layout"
+import { GoogleTagManagerHead, GoogleTagManagerBody } from "./components/google-tag-manager"
 import "./globals.css"
 import "./fonts.css"
 
@@ -58,8 +59,10 @@ body {
   font-weight: 500;
 }
         ` }} />
+        <GoogleTagManagerHead />
       </head>
       <body>
+        <GoogleTagManagerBody />
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

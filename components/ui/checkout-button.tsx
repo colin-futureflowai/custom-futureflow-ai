@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { stripeService } from '@/lib/services/stripe.service'
 import { logger } from '@/lib/utils/logger'
+import GTMService from '@/lib/services/gtm.service'
 
 interface CheckoutButtonProps {
   priceId?: string
@@ -33,6 +34,13 @@ export default function CheckoutButton({
     setError(null)
 
     try {
+      // Track checkout initiation in GTM
+      const price = 27 // Pre-order price
+      const abVariant = localStorage.getItem('ab_variant') || undefined
+
+      GTMService.trackAddToCart(price, abVariant)
+      GTMService.trackBeginCheckout(price, abVariant)
+
       // Call success callback before redirect
       onSuccess?.()
 
