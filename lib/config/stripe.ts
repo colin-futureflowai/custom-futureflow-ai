@@ -52,7 +52,7 @@ export const stripeConfig = {
   // Product & Price IDs - Should be set via environment variables
   productId: process.env.STRIPE_PRODUCT_ID || 'prod_T6kAkhn34VNhQR',
 
-  priceId: process.env.STRIPE_PRICE_ID || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1SCNCwCjh2scZSeWZ6RGollE',
+  priceId: process.env.STRIPE_PRICE_ID || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || '',
 
   // URLs - Using smart base URL detection
   // IMPORTANT: Set NEXT_PUBLIC_BASE_URL in Vercel environment variables with your custom domain
