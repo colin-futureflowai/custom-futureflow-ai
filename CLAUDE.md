@@ -39,13 +39,6 @@ Building a conversion-focused landing page for the pre-order of the e-book "Gewo
 --brand-white: #FFFFFF;       /* Backgrounds */
 --brand-black: #000000;       /* Deep contrast */
 
-/* Landing Page Specific */
---landing-blue: #2563EB;      /* Professional blue */
---landing-green: #10B981;     /* Trust green */
---landing-orange: #F97316;    /* CTA accent */
---landing-bg: #F9FAFB;        /* Light gray background */
-```
-
 ### Typography
 - Primary: BR Sonoma (FutureFlowAI brand font)
 - Fallback: Modern sans-serif

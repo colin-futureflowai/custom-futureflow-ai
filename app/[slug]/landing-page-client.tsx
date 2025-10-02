@@ -59,7 +59,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
   const bookTitle = pageData.sharedContent?.bookTitle || pageData.sharedContent?.workshopTitle || pageData.sharedContent?.serviceTitle || "Gewoon Beginnen met AI"
   const author = pageData.sharedContent?.author || pageData.sharedContent?.trainer || pageData.sharedContent?.consultant || "FutureFlowAI"
   const pageCount = pageData.sharedContent?.pageCount || 200
-  const publishYear = pageData.sharedContent?.publishYear || 2024
+  const publishYear = 2025
 
   const originalPrice = pageData.sharedContent?.originalPrice || 47
   const discountPrice = pageData.sharedContent?.discountPrice || 27
@@ -68,7 +68,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
   // Get content sections from BaseHub
   const contentSections = pageData.sharedContent?.contentSections
   const sectionTitle = contentSections?.sectionTitle || "Wat krijg je?"
-  const contentDescription = contentSections?.contentDescription || "11 Hoofdstukken verdeeld over 4 delen:"
+  const contentDescription = contentSections?.contentDescription || "Alles wat je nodig hebt, overzichtelijk in 4 delen"
   const part1 = contentSections?.part1 || { title: "Deel 1: Kennismaken met AI", description: "Begrijp wat AI is en wat het voor u kan betekenen" }
   const part2 = contentSections?.part2 || { title: "Deel 2: De Juiste Mindset", description: "Ontwikkel de juiste houding tegenover AI" }
   const part3 = contentSections?.part3 || { title: "Deel 3: Gewoon Doen", description: "Praktische stappen om vandaag nog te beginnen" }
@@ -114,6 +114,54 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
       description: 'Het gaat niet om mensen vervangen. Het gaat om mensen versterken.'
     }
   ]
+
+  // Static CountUp (animation disabled per request)
+  const CountUp = ({ end, suffix = '', className = '' }: { end: number; suffix?: string; className?: string }) => {
+    return <span className={className}>{end}{suffix}</span>
+  }
+
+  // Helper to render stat values with graceful fallbacks
+  const renderStatValue = (val: string) => {
+    // Handle patterns like '300%'
+    const percentMatch = val.match(/^(\d+)(%)$/)
+    if (percentMatch) {
+      const num = parseInt(percentMatch[1], 10)
+      const suf = percentMatch[2]
+      return <CountUp end={num} suffix={suf} />
+    }
+    // Handle patterns like '4x'
+    const timesMatch = val.match(/^(\d+)(x)$/i)
+    if (timesMatch) {
+      const num = parseInt(timesMatch[1], 10)
+      const suf = timesMatch[2]
+      return <CountUp end={num} suffix={suf.toLowerCase()} />
+    }
+    // Handle patterns like '3m → 3w'
+    if (val.includes('→')) {
+      const [left, right] = val.split('→').map(s => s.trim())
+      const leftMatch = left.match(/^(\d+)(.*)$/)
+      const rightMatch = right.match(/^(\d+)(.*)$/)
+      return (
+        <span className="inline-flex items-center gap-1">
+          {leftMatch ? (
+            <>
+              <CountUp end={parseInt(leftMatch[1], 10)} />
+              <span>{leftMatch[2]}</span>
+            </>
+          ) : (<span>{left}</span>)}
+          <span className="mx-1">→</span>
+          {rightMatch ? (
+            <>
+              <CountUp end={parseInt(rightMatch[1], 10)} />
+              <span>{rightMatch[2]}</span>
+            </>
+          ) : (<span>{right}</span>)}
+        </span>
+      )
+    }
+    // Fallback: show as-is
+    return <span>{val}</span>
+  }
 
   // Get Success Story from BaseHub
   const successStory = pageData.sharedContent?.successStory || {
@@ -228,17 +276,17 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
 
   // Get content-specific text based on landing type (keeping for other uses)
   let contentType = "hoofdstukken"
-  let whyTitle = "Waarom Dit Boek?"
-  let ctaTitle = "Pre-order Nu Met Korting"
+  let whyTitle = "Waarom dit boek?"
+  let ctaTitle = "Pre-order nu met korting"
 
   if (landingType === 'workshop') {
     contentType = "modules"
-    whyTitle = "Waarom Deze Workshop?"
-    ctaTitle = "Reserveer Nu Met Korting"
+    whyTitle = "Waarom deze workshop?"
+    ctaTitle = "Reserveer nu met korting"
   } else if (landingType === 'consulting') {
     contentType = "fasen"
-    whyTitle = "Waarom Onze Consulting?"
-    ctaTitle = "Start Nu Met Korting"
+    whyTitle = "Waarom onze consulting?"
+    ctaTitle = "Start nu met korting"
   }
 
   // Define navigation items
@@ -250,7 +298,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
   ]
 
   return (
-    <div className="landing-page min-h-screen bg-[#F9FAFB]" data-variant={selectedVariant} style={{ fontFamily: "'BR Sonoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif" }}>
+    <div className="landing-page min-h-screen bg-white" data-variant={selectedVariant} style={{ fontFamily: "'BR Sonoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif" }}>
       {/* Hero Section with Dynamic Arrow - Original Design with BaseHub Content */}
       <HeroSection
         heading={heroTitle}
@@ -261,15 +309,16 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
         imageUrl="" // No separate image, will use video first frame
         originalPrice={originalPrice}
         navItems={navItems}
+        showNav={false}
       />
 
       {/* Content Section - With 3D Book for AI Book, Centered for others */}
-      <section id="inhoud-sectie" className="py-6 sm:py-12 lg:py-24 bg-[#F9FAFB]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={landingType === 'aiBoek' ? "grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center" : "max-w-4xl mx-auto"}>
+      <section id="inhoud-sectie" className="pt-8 pb-0 md:py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className={landingType === 'aiBoek' ? "grid lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-12 items-center" : "max-w-4xl mx-auto"}>
             {/* 3D Book Preview - Only for AI Book */}
             {landingType === 'aiBoek' && (
-              <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] order-2 lg:order-1">
+              <div className="w-full h-[220px] sm:h-[340px] md:h-[440px] lg:h-[540px] order-2 lg:order-1 -mb-4 sm:mb-0">
                 <LandingBookPreview />
               </div>
             )}
@@ -277,7 +326,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
             {/* What You Get Content */}
             <div className={landingType === 'aiBoek' ? "order-1 lg:order-2" : ""}>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#3D3D3D] mb-6 sm:mb-8">
-                Wat Krijg Je?
+                Wat krijg je?
               </h2>
 
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
@@ -354,6 +403,18 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
                     )}
                   </p>
                 </div>
+
+                
+
+                {/* Directe koop CTA bij boek */}
+                {landingType === 'aiBoek' && (
+                  <div className="mt-6 text-center">
+                    <CheckoutButton className="inline-flex items-center px-5 py-3 rounded-lg bg-[#32a029] text-white hover:bg-[#2a8524] font-semibold shadow-sm">
+                      Bestel direct →
+                    </CheckoutButton>
+                    <p className="text-xs text-[#3D3D3D]/70 mt-2">Als eerste in je inbox bij lancering</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -361,8 +422,8 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
       </section>
 
       {/* Why This Book/Workshop/Service Section */}
-      <section id="waarom-sectie" className="py-12 sm:py-16 lg:py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="waarom-sectie" className="pt-4 pb-10 md:py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-[#3D3D3D] mb-8 sm:mb-12">
             {whyTitle}
           </h2>
@@ -388,55 +449,55 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
         </div>
       </section>
 
-      {/* Success Story Section */}
-      <section className="py-12 sm:py-16 lg:py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-[#3D3D3D] mb-8 sm:mb-12">
+      {/* Success Story Section - Stats bar with animated count-up */}
+      <section className="py-10 md:py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-[#3D3D3D] mb-6 sm:mb-8">
             Succesverhaal uit {landingType === 'workshop' ? 'de workshop' : landingType === 'consulting' ? 'onze consulting' : 'het boek'}
           </h2>
 
-          <div className="bg-gradient-to-br from-[#32a029]/5 to-[#32a029]/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12">
-            <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#3D3D3D] mb-4 sm:mb-6">
-              {successStory.title}
-            </h3>
-
-            <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#32a029] mb-1 sm:mb-2">
-                  {successStory.stat1Value}
-                </div>
-                <div className="text-xs sm:text-sm lg:text-base text-[#3D3D3D]/70">
-                  {successStory.stat1Label}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#32a029] mb-1 sm:mb-2">
-                  {successStory.stat2Value}
-                </div>
-                <div className="text-xs sm:text-sm lg:text-base text-[#3D3D3D]/70">
-                  {successStory.stat2Label}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#32a029] mb-1 sm:mb-2">
-                  {successStory.stat3Value}
-                </div>
-                <div className="text-xs sm:text-sm lg:text-base text-[#3D3D3D]/70">
-                  {successStory.stat3Label}
-                </div>
+          <div className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm">
+            {/* Persona header */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+              <div className="h-12 w-12 rounded-full bg-[#32a029]/10 flex items-center justify-center text-[#32a029] font-semibold">✓</div>
+              <div className="text-center sm:text-left">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#3D3D3D]">{successStory.title}</h3>
+                <p className="text-sm text-[#3D3D3D]/70 mt-1">Uitgelicht resultaat van een echte ondernemer</p>
               </div>
             </div>
 
-            <p className="text-sm sm:text-base text-[#3D3D3D]/80 italic">
+            {/* Stats bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              <div className="rounded-xl border border-gray-100 p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-[#32a029] mb-1">{renderStatValue(successStory.stat1Value)}</div>
+                <div className="text-xs sm:text-sm text-[#3D3D3D]/70">{successStory.stat1Label}</div>
+              </div>
+              <div className="rounded-xl border border-gray-100 p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-[#32a029] mb-1">{renderStatValue(successStory.stat2Value)}</div>
+                <div className="text-xs sm:text-sm text-[#3D3D3D]/70">{successStory.stat2Label}</div>
+              </div>
+              <div className="rounded-xl border border-gray-100 p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-[#32a029] mb-1">{renderStatValue(successStory.stat3Value)}</div>
+                <div className="text-xs sm:text-sm text-[#3D3D3D]/70">{successStory.stat3Label}</div>
+              </div>
+            </div>
+
+            {/* Testimonial quote */}
+            <p className="text-sm sm:text-base text-[#3D3D3D]/80 italic mt-4 sm:mt-6 text-center">
               "{successStory.quote}"
             </p>
+
+            {/* CTA under stats for conversion */}
+            <div className="mt-5 sm:mt-6 text-center">
+              <a href="#preorder-section" className="inline-flex items-center px-5 py-3 rounded-lg bg-[#32a029] text-white hover:bg-[#2a8524] font-semibold shadow-sm">Ook zulke resultaten? Start vandaag →</a>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Pre-order Section with BaseHub Pricing */}
-      <section id="preorder-section" className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-[#32a029]/10 to-[#32a029]/5">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="preorder-section" className="py-10 md:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl p-6 sm:p-8 lg:p-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-[#3D3D3D] mb-6 sm:mb-8">
               {ctaTitle}
@@ -446,7 +507,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
               <div className="inline-block">
                 <p className="text-[#3D3D3D]/60 line-through text-base sm:text-lg lg:text-xl">Normale prijs: €{originalPrice}</p>
                 <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#32a029] mt-1 sm:mt-2">€{discountPrice}</p>
-                <p className="text-[#F97316] font-semibold text-base sm:text-lg mt-1 sm:mt-2">{discountPercentage}% {landingType === 'workshop' ? 'Early Bird' : landingType === 'consulting' ? 'Introductie' : 'Pre-order'} Korting!</p>
+                <p className="text-[#F97316] font-semibold text-base sm:text-lg mt-1 sm:mt-2">{discountPercentage}% {landingType === 'workshop' ? 'early bird' : landingType === 'consulting' ? 'introductie' : 'pre-order'} korting!</p>
               </div>
             </div>
 
@@ -467,12 +528,12 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
             </div>
 
             <div className="text-center">
-              <CheckoutButton variant="secondary">
+              <CheckoutButton className="inline-flex items-center px-6 py-3 rounded-lg bg-[#32a029] text-white hover:bg-[#2a8524] font-semibold shadow-sm">
                 {landingType === 'workshop' ?
-                  'Ja, Reserveer Mijn Plek!' :
+                  'Ja, reserveer mijn plek!' :
                   landingType === 'consulting' ?
-                  'Ja, Start Mijn AI-Traject!' :
-                  'Ja, Ik Wil Pre-orderen!'
+                  'Ja, start mijn AI-traject!' :
+                  'Ja, ik wil pre-orderen!'
                 } →
               </CheckoutButton>
               <p className="text-[#3D3D3D]/60 text-xs sm:text-sm mt-3 sm:mt-4">
@@ -490,10 +551,10 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
       </section>
 
       {/* FAQ Section */}
-      <section className="py-12 sm:py-16 lg:py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-10 sm:py-14 lg:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-[#3D3D3D] mb-8 sm:mb-12">
-            Veelgestelde Vragen
+            Veelgestelde vragen
           </h2>
 
           <div className="space-y-4 sm:space-y-6">
@@ -511,24 +572,7 @@ export default function LandingPageClient({ pageData, selectedVariant, landingTy
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#3D3D3D] text-white py-8 sm:py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
-              FutureFlow<span className="text-[#32a029]">AI</span>
-            </h3>
-            <p className="text-white/70 text-sm sm:text-base mb-6 sm:mb-8 px-4">
-              {footerText}
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-8 text-xs sm:text-sm">
-              <a href="#" className="hover:text-[#32a029] transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-[#32a029] transition-colors">Algemene Voorwaarden</a>
-              <a href="#" className="hover:text-[#32a029] transition-colors">Contact</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer replaced by global SiteFooter in layout */}
     </div>
   )
 }

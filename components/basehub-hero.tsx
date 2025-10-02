@@ -26,19 +26,27 @@ export function BaseHubHero({
   discountPercentage = 43,
 }: BaseHubHeroProps) {
   return (
-    <section className="relative min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div className="container mx-auto px-4 py-4">
+    <section className="relative min-h-screen flex flex-col w-full max-w-[100vw]">
+      {/* Topbar */}
+      <div className="w-full bg-[#488441] text-white text-sm">
+        <div className="w-full max-w-[100vw] px-[5%] py-2 text-center font-normal">
+          Zien wat je zelf beter kunt doen? Doe de gratis AI-check <a href="/ai-check" className="underline">hier</a>.
+        </div>
+      </div>
+
+      {/* Header */}
+      <nav className="w-full bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="w-full max-w-[100vw] px-[5%] py-6">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold">
+            {/* Logo smaller */}
+            <div className="text-xl font-bold">
               FutureFlow<span className="text-green-600">AI</span>
             </div>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">Home</a>
-              <a href="#waarom-sectie" className="text-gray-600 hover:text-green-600 transition-colors">Waarom dit boek?</a>
-              <a href="#inhoud-sectie" className="text-gray-600 hover:text-green-600 transition-colors">Inhoud</a>
-              <a href="#preorder-section" className="text-gray-600 hover:text-green-600 transition-colors">Pre-order</a>
+            {/* Keep contact button; remove nav items for landing */}
+            <div className="flex items-center">
+              <Link href="/vrijblijvend-gesprek-inplannen" className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-[#3D3D3D] hover:bg-gray-50 font-medium">
+                Contact opnemen
+              </Link>
             </div>
           </div>
         </div>
@@ -47,8 +55,8 @@ export function BaseHubHero({
       {/* Hero Content */}
       <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-green-50 to-white overflow-hidden pt-20">
 
-      <div className="container mx-auto px-4 py-16 z-10">
-        <div className="max-w-6xl mx-auto">
+      <div className="w-full max-w-[100vw] px-[5%] py-16 z-10">
+        <div className="w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left column - Text content */}
             <div className="space-y-8">

@@ -52,19 +52,21 @@ export default function ConsultingLandingClient({ pageData, selectedVariant }: C
 
   return (
     <>
-      {/* Variant Selector for Testing */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-100 border-b border-yellow-300 p-2">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <p className="text-xs">
-            Testing Variant: <strong>{selectedVariant}</strong>
-          </p>
-          <div className="space-x-2 text-xs">
-            <a href="?variant=control" className="text-blue-600 hover:underline">Control</a>
-            <a href="?variant=urgency" className="text-orange-600 hover:underline">Urgency</a>
-            <a href="?variant=social" className="text-green-600 hover:underline">Social</a>
+      {/* Variant Selector for Testing (env-gated) */}
+      {process.env.NEXT_PUBLIC_SHOW_AB_BANNER === 'true' && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-100 border-b border-yellow-300 p-2">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between">
+            <p className="text-xs">
+              Testing Variant: <strong>{selectedVariant}</strong>
+            </p>
+            <div className="space-x-2 text-xs">
+              <a href="?variant=control" className="text-blue-600 hover:underline">Control</a>
+              <a href="?variant=urgency" className="text-orange-600 hover:underline">Urgency</a>
+              <a href="?variant=social" className="text-green-600 hover:underline">Social</a>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Hero Section with original design */}
       <HeroSection
@@ -74,11 +76,12 @@ export default function ConsultingLandingClient({ pageData, selectedVariant }: C
         onButtonClick={handleCTAClick}
         videoUrl={videoUrl}
         originalPrice={pageData.sharedContent.originalPrice}
+        showNav={false}
       />
 
       {/* 3D Book Preview Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-12 md:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[#3D3D3D] mb-4">
               Transformatie Roadmap
@@ -88,7 +91,7 @@ export default function ConsultingLandingClient({ pageData, selectedVariant }: C
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] rounded-3xl p-8 shadow-xl">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <LandingBookPreview />
           </div>
 
@@ -119,30 +122,20 @@ export default function ConsultingLandingClient({ pageData, selectedVariant }: C
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-[#32a029] to-[#28a020] text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Klaar om te Beginnen met AI?
-          </h2>
-          <p className="text-xl mb-8 text-white/90">
-            Join 150+ ondernemers die al de stap hebben gezet
-          </p>
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-8 max-w-md mx-auto">
-            <div className="text-3xl font-bold mb-2">
-              Introductie Aanbieding
-            </div>
+      <section className="py-12 md:py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold mb-4 text-[#3D3D3D]">Klaar om te beginnen met AI?</h2>
+          <p className="text-lg md:text-xl mb-8 text-[#3D3D3D]/80">Join 150+ ondernemers die al de stap hebben gezet</p>
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm max-w-md mx-auto">
+            <div className="text-2xl font-bold mb-2 text-[#3D3D3D]">Introductie-aanbieding</div>
             <div className="flex items-center justify-center gap-4 mb-6">
-              <span className="text-white/60 line-through text-2xl">€{pageData.sharedContent.originalPrice}</span>
-              <span className="text-5xl font-bold">€{pageData.sharedContent.discountPrice}</span>
+              <span className="text-[#3D3D3D]/60 line-through text-2xl">€{pageData.sharedContent.originalPrice}</span>
+              <span className="text-4xl font-bold text-[#32a029]">€{pageData.sharedContent.discountPrice}</span>
             </div>
-            <CheckoutButton
-              className="w-full bg-white text-[#32a029] hover:bg-gray-100 font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105"
-            >
+            <CheckoutButton className="w-full bg-[#32a029] hover:bg-[#2a8524] text-white font-semibold py-4 px-8 rounded-lg text-lg transition-all">
               {heroContent.ctaText}
             </CheckoutButton>
-            <p className="text-sm text-white/80 mt-4">
-              30 dagen geld-terug-garantie
-            </p>
+            <p className="text-sm text-[#3D3D3D]/70 mt-4">30 dagen geld-terug-garantie</p>
           </div>
         </div>
       </section>
