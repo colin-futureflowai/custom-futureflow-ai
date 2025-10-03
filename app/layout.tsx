@@ -2,11 +2,13 @@ import type React from "react"
 import type { Metadata } from "next"
 import ClientLayout from "./client-layout"
 import { GoogleTagManagerHead, GoogleTagManagerBody } from "./components/google-tag-manager"
+import SiteHeader from "@/components/site-header"
+import SiteFooter from "@/components/site-footer"
 import "./globals.css"
 import "./fonts.css"
 
 export const metadata: Metadata = {
-  title: "Gewoon Beginnen met AI - FutureFlowAI",
+  title: "Gewoon beginnen met AI - FutureFlowAI",
   description: "Praktische gids voor ondernemers die willen starten met AI zonder technische kennis",
   icons: {
     icon: [
@@ -63,7 +65,9 @@ body {
       </head>
       <body>
         <GoogleTagManagerBody />
+        <SiteHeader />
         <ClientLayout>{children}</ClientLayout>
+        <SiteFooter />
       </body>
     </html>
   )

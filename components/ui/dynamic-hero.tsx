@@ -63,9 +63,9 @@ const rightNavItems: NavItem[] = [
 ]
 
 const HeroSection: React.FC<HeroSectionProps> = ({
-    heading = "Gewoon Beginnen met AI",
-    tagline = "Elke Ondernemer Kan AI Leren",
-    buttonText = "Pre-order Nu - €27",
+    heading = "Gewoon beginnen met AI",
+    tagline = "Elke ondernemer kan AI leren",
+    buttonText = "Pre-order nu - €27",
     onButtonClick,
     imageUrl,
     videoUrl,
@@ -213,15 +213,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         const finalOpacity = distanceOpacity * scrollFade
 
         const arrowColor = resolvedCanvasColorsRef.current.strokeStyle
-        ctx.strokeStyle = `rgba(${arrowColor.r}, ${arrowColor.g}, ${arrowColor.b}, ${finalOpacity})`
-        ctx.lineWidth = 2.5 // Thicker arrow for better visibility
+        // Create a smooth gradient from cursor (lighter) to target (stronger)
+        const gradient = ctx.createLinearGradient(x0!, y0!, x1, y1)
+        gradient.addColorStop(0, `rgba(${arrowColor.r}, ${arrowColor.g}, ${arrowColor.b}, ${finalOpacity * 0.2})`)
+        gradient.addColorStop(1, `rgba(${arrowColor.r}, ${arrowColor.g}, ${arrowColor.b}, ${finalOpacity})`)
+        ctx.strokeStyle = gradient
+        ctx.lineWidth = 2.2
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
 
         // Draw curve
         ctx.save()
         ctx.beginPath()
         ctx.moveTo(x0!, y0!)
         ctx.quadraticCurveTo(controlX, controlY, x1, y1)
-        ctx.setLineDash([12, 4]) // Longer dashes for professional look
+        // Continuous line (no dash) for a cleaner, connected look
         ctx.stroke()
         ctx.restore()
 
@@ -368,7 +374,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="bg-white text-gray-700 min-h-screen flex flex-col">
             {showNav && (
                 <nav className="w-full bg-white border-b border-gray-100 relative">
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4">
+                    <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-3">
                         {/* Mobile Navigation */}
                         <div className="flex items-center justify-between md:hidden">
                             {/* Logo */}
@@ -491,7 +497,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </nav>
             )}
 
-            <main className="flex-grow flex flex-col items-center justify-center pt-6 sm:pt-12 md:pt-16">
+            <main className="relative z-20 flex-grow flex flex-col items-center justify-center pt-8 md:pt-12">
                 <div className="flex flex-col items-center">
                     <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-center px-4 leading-tight">
                         {heading.split(' ').map((word, i) => (
@@ -511,10 +517,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                     <p className="mt-2 text-[#3D3D3D]/60 text-center text-base px-4">
                         Van twijfel naar toepassing in 11 praktische hoofdstukken
                     </p>
+                    <div className="mt-4 text-[#3D3D3D]/70 text-sm px-4">
+                        Aanbevolen door <span className="font-semibold">20+ MKB-bedrijven</span>
+                    </div>
                 </div>
 
                 {/* Video Section - Moved here between title and button */}
-                <div className="mt-8 lg:mt-10 w-full max-w-screen-md mx-auto overflow-hidden px-4 sm:px-2">
+                <div className="mt-8 lg:mt-10 w-full max-w-3xl mx-auto overflow-hidden px-4 sm:px-2">
                     {customContent ? (
                         <div className="bg-white rounded-2xl p-4">
                             {customContent}
@@ -584,7 +593,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </main>
 
             <div className="h-6 sm:h-12 md:h-20"></div>
-            <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-10"></canvas>
+            <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0"></canvas>
         </div>
     )
 }

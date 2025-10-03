@@ -1,9 +1,33 @@
 "use client"
 
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useFrame } from "@react-three/fiber"
 import { TrackballControls, Environment } from "@react-three/drei"
 import { Suspense, useRef, useEffect, useState, useCallback } from "react"
 import { DutchAIBook } from "./dutch-ai-book"
+
+// Child component so useFrame runs inside the <Canvas> tree
+function PulsingBook({
+  scale,
+  position,
+  baseRotationX,
+}: {
+  scale: [number, number, number]
+  position: [number, number, number]
+  baseRotationX: number
+}) {
+  const groupRef = useRef<any>(null)
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return
+    const t = clock.getElapsedTime()
+    groupRef.current.rotation.x = baseRotationX + Math.cos(t * 0.6) * 0.02
+    groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.06
+  })
+  return (
+    <group ref={groupRef} scale={scale} position={position} rotation={[baseRotationX, 0, 0]}>
+      <DutchAIBook autoRotate={false} rotationSpeed={0} />
+    </group>
+  )
+}
 
 export default function LandingBookPreview() {
   const controlsRef = useRef<any>()
@@ -35,9 +59,10 @@ export default function LandingBookPreview() {
 
   // Calculate responsive scale based on window width
   const getScale = (): [number, number, number] => {
-    if (windowWidth < 480) return [2.8, 2.8, 2.8] // Extra small mobile
-    if (windowWidth < 640) return [3.2, 3.2, 3.2] // Small mobile
-    if (windowWidth < 768) return [3.8, 3.8, 3.8] // Large mobile
+    // Increase mobile scale by ~1.5x
+    if (windowWidth < 480) return [4.2, 4.2, 4.2] // Extra small mobile
+    if (windowWidth < 640) return [4.8, 4.8, 4.8] // Small mobile
+    if (windowWidth < 768) return [5.7, 5.7, 5.7] // Large mobile
     if (windowWidth < 1024) return [4.5, 4.5, 4.5] // Tablet
     return [5, 5, 5] // Desktop
   }
@@ -71,6 +96,8 @@ export default function LandingBookPreview() {
     cameraFov: getCameraFov()
   }
 
+  const baseX = params.rotation[0]
+
   // Get device pixel ratio optimized for mobile
   const getDpr = (): [number, number] => {
     // Lower DPR for mobile devices to improve performance
@@ -95,6 +122,10 @@ export default function LandingBookPreview() {
         performance={{ min: 0.5 }} // Performance optimization for mobile
       >
         <Suspense fallback={null}>
+          {/* Subtle pulsing rotation using useFrame */}
+          {/** Update the rotation around Y with a small oscillation **/}
+          {/** We keep this outside of R3F tree; useFrame below will mutate groupRef rotation **/}
+
           {/* Lighting setup from example */}
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -103,17 +134,8 @@ export default function LandingBookPreview() {
           {/* Environment for reflections */}
           <Environment preset="sunset" />
 
-          {/* The Dutch AI book */}
-          <group
-            scale={params.scale}
-            position={params.position}
-            rotation={params.rotation}
-          >
-            <DutchAIBook
-              autoRotate={false}
-              rotationSpeed={0}
-            />
-          </group>
+          {/* The Dutch AI book with subtle pulsing animation */}
+          <PulsingBook scale={params.scale} position={params.position} baseRotationX={baseX} />
 
           {/* Interactive controls optimized for touch */}
           <TrackballControls

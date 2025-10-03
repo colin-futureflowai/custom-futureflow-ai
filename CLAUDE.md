@@ -3,9 +3,29 @@
 ## Project Overview
 Building a conversion-focused landing page for the pre-order of the e-book "Gewoon Beginnen met AI" by FutureFlowAI. This is a practical guide for entrepreneurs who want to start with AI without technical knowledge.
 
+## 🚀 Current Project Status
+
+### Production Environment
+- **URL**: https://gewoonbeginnenmetai.futureflowai.nl/
+- **Branch**: `main`
+- **Status**: ✅ Live with A/B testing and Google Ads tracking
+
+### Development Environment
+- **Branch**: `development`
+- **Purpose**: Testing and development before production release
+
+### Recent Implementations
+- ✅ **A/B Testing System**: BaseHub-integrated with 3 variants (Control, Urgency, Social)
+- ✅ **Google Tag Manager**: GTM-WQZ9GPGW with full e-commerce tracking
+- ✅ **Google Ads Conversion**: Tracking ID AW-17072775739
+- ✅ **Custom Domain Fix**: Dynamic URL detection for Stripe redirects
+- ✅ **Branch Strategy**: Separate development and production branches
+
 ## Key Project Files
 - `LOGBOOK.md` - **SESSION TRACKING: Always read and update this file**
 - `SITE_STRUCTURE.md` - **IMPORTANT: Update this when adding pages or changing BaseHub structure**
+- `GTM_TRACKING.md` - Google Tag Manager implementation guide
+- `BRANCH_STRATEGY.md` - Git workflow and deployment strategy
 - `LandingsPaginaBeschrijving.md` - Complete landing page requirements and structure
 - `Brandbook.md` - FutureFlowAI brand guidelines
 - `components/book-showcase/` - 3D book component to be integrated
@@ -18,13 +38,6 @@ Building a conversion-focused landing page for the pre-order of the e-book "Gewo
 --brand-dark-gray: #3D3D3D;   /* Primary text */
 --brand-white: #FFFFFF;       /* Backgrounds */
 --brand-black: #000000;       /* Deep contrast */
-
-/* Landing Page Specific */
---landing-blue: #2563EB;      /* Professional blue */
---landing-green: #10B981;     /* Trust green */
---landing-orange: #F97316;    /* CTA accent */
---landing-bg: #F9FAFB;        /* Light gray background */
-```
 
 ### Typography
 - Primary: BR Sonoma (FutureFlowAI brand font)
@@ -72,31 +85,39 @@ The existing book showcase should be adapted for the landing page:
 ### Phase 1: Foundation ✅
 - [x] Fix 3D book component errors
 - [x] Ensure React 18 compatibility
-- [ ] Create landing page base structure
+- [x] Create landing page base structure
+- [x] BaseHub CMS integration
 
-### Phase 2: Hero Section
-- [ ] Adapt book-showcase for single book display
-- [ ] Integrate promo video
-- [ ] Create CTA with countdown
-- [ ] Add trust indicators
+### Phase 2: Core Features ✅
+- [x] Implement Stripe payment integration
+- [x] Create checkout flow with custom domain support
+- [x] Build success page with conversion tracking
+- [x] Setup abandoned cart recovery page
 
-### Phase 3: Content Sections
-- [ ] Implement all content sections
-- [ ] Add quotes from the book
-- [ ] Create FAQ component
-- [ ] Build pre-order form
+### Phase 3: Conversion Optimization ✅
+- [x] A/B testing setup with BaseHub variants
+- [x] Google Tag Manager integration
+- [x] Google Ads conversion tracking
+- [x] Add urgency elements (pre-order pricing)
 
-### Phase 4: Conversion Optimization
-- [ ] Add urgency elements
-- [ ] Implement exit-intent popup
-- [ ] Add sticky mobile CTA
-- [ ] A/B testing setup
+### Phase 4: Infrastructure ✅
+- [x] Setup branch strategy (main/development)
+- [x] Configure environment variables
+- [x] Vercel deployment optimization
+- [x] Custom domain configuration
 
-### Phase 5: Polish & Launch
-- [ ] Performance optimization
-- [ ] Analytics integration
-- [ ] Payment integration
-- [ ] Final testing
+### Phase 5: Content Implementation 🔄
+- [ ] Integrate promo video in hero section
+- [ ] Optimize 3D book component for landing pages
+- [ ] Add all content sections from BaseHub
+- [ ] Implement FAQ component
+- [ ] Add testimonials and social proof
+
+### Phase 6: Polish & Optimization 📝
+- [ ] Performance optimization (target <3s load time)
+- [ ] Mobile responsiveness improvements
+- [ ] SEO optimization for Dutch market
+- [ ] Accessibility improvements (WCAG compliance)
 
 ## Key Messages to Include
 
@@ -175,6 +196,10 @@ app/
 
 ## Commands for Development
 ```bash
+# Switch branches
+git checkout main          # Production branch
+git checkout development   # Development branch
+
 # Run development server
 npm run dev
 
@@ -183,14 +208,51 @@ npm run build
 
 # Run linting
 npm run lint
+
+# Deploy to production (via PR)
+# Create PR from development → main on GitHub
 ```
+
+## Important Configuration
+
+### Environment Variables (Vercel)
+```bash
+# Stripe (Use test keys for development, live for production)
+STRIPE_SECRET_KEY=sk_xxx
+STRIPE_PRICE_ID=price_xxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_xxx
+NEXT_PUBLIC_STRIPE_PRICE_ID=price_xxx
+
+# BaseHub
+BASEHUB_TOKEN=xxx
+
+# Custom Domain
+NEXT_PUBLIC_BASE_URL=https://gewoonbeginnenmetai.futureflowai.nl
+
+# Analytics
+NEXT_PUBLIC_GTM_ID=GTM-WQZ9GPGW
+NEXT_PUBLIC_GA_CONVERSION_ID=AW-17072775739
+```
+
+## A/B Testing & Tracking
+
+### Current A/B Test Variants (BaseHub)
+1. **Control Version** - Standard landing page
+2. **Urgency Version** - Focus on limited time offer
+3. **Social Version** - Emphasis on social proof
+
+### Google Tag Manager Events
+- `ab_test_assignment` - When user gets variant
+- `add_to_cart` - When checkout button clicked
+- `begin_checkout` - Start of checkout process
+- `purchase` - Successful conversion (includes variant data)
 
 ## Notes
 - The 3D book component is now stable with React 18
-- Use the Dutch AI book (index 1) from booksData
-- Video file should be added to `/public/videos/`
-- Consider using Vercel for deployment (Next.js native)
-- Payment integration will need separate setup (Stripe/Mollie)
+- A/B test variants are managed in BaseHub under "Gewoon beginnen met AI - Landing"
+- All conversions include A/B test variant data for optimization
+- Stripe price IDs must be set via environment variables (no hardcoded fallbacks)
+- GTM container must be published for tracking to work
 
 ## Important Maintenance Tasks
 
